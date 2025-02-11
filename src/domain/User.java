@@ -23,4 +23,20 @@ public class User {
                 "\nIdade: " + this.age +
                 "\nAltura: " + this.height;
     }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
 }
