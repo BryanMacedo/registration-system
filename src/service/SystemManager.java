@@ -13,7 +13,7 @@ public class SystemManager {
 
     Scanner sc = new Scanner(System.in);
 
-    public void readQuestions(){
+    public void readQuestions() {
         String pathFormTxt = "D:\\java-estudos\\registration-system\\src\\resource\\formulario.txt";
 
         try (BufferedReader bReader = new BufferedReader(new FileReader(pathFormTxt))) {
@@ -28,8 +28,10 @@ public class SystemManager {
         }
     }
 
-    public void registerUser(){
-        if (mainQuestions.isEmpty()){
+    public void registerUser() {
+        String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
+
+        if (mainQuestions.isEmpty()) {
             readQuestions();
         }
         System.out.println("--- Cadastrando um usuário ---");
@@ -45,30 +47,33 @@ public class SystemManager {
         System.out.print(mainQuestions.get(3) + " ");
         double height = sc.nextDouble();
         sc.nextLine();
+        System.out.println();
 
         User user = new User(fullName, email, age, height);
         users.add(user);
 
-        System.out.println(users.get(0));
-
-        String fileName = ("1-" + users.get(0).getFullName().toUpperCase() + ".txt").replaceAll(" ", "");
-        String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
-
         File directory = new File(folderPath);
         if (!directory.exists()) {
             directory.mkdir();
+
         }
+
+        // verifica a quantidade de arquivos txt
+        File[] verifyFiles = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
+        int quantityFile = (verifyFiles != null) ? verifyFiles.length : 0;
+
+        String fileName = (quantityFile + 1 + "-" + users.get(quantityFile).getFullName().toUpperCase() + ".txt").replaceAll(" ", "");
 
         File userFile = new File(folderPath, fileName);
 
         try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(userFile))) {
-            bWriter.write(users.get(0).getFullName());
+            bWriter.write(users.get(quantityFile).getFullName());
             bWriter.newLine();
-            bWriter.write(users.get(0).getEmail());
+            bWriter.write(users.get(quantityFile).getEmail());
             bWriter.newLine();
-            bWriter.write(String.valueOf(users.get(0).getAge()));
+            bWriter.write(String.valueOf(users.get(quantityFile).getAge()));
             bWriter.newLine();
-            bWriter.write(String.valueOf(users.get(0).getHeight()));
+            bWriter.write(String.valueOf(users.get(quantityFile).getHeight()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
