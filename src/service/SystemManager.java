@@ -44,6 +44,7 @@ public class SystemManager {
 
         System.out.print(mainQuestions.get(3) + " ");
         double height = sc.nextDouble();
+        sc.nextLine();
 
         User user = new User(fullName, email, age, height);
         users.add(user);
@@ -71,7 +72,5 @@ public class SystemManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        sc.close();
     }
 }
