@@ -32,34 +32,6 @@ public class SystemManager {
         String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
         File directory = new File(folderPath);
 
-        // verifica se já tem usuários cadastrados e caso tenha adiciona ele no List
-        if (directory.exists() && directory.isDirectory()) {
-            File[] txtFiles = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
-            if (txtFiles != null && txtFiles.length > 0){
-                for (int i = 0; i < txtFiles.length; i++) {
-                    try (BufferedReader bReader = new BufferedReader(new FileReader(txtFiles[i]))){
-                        String line01 = bReader.readLine();
-                        String line02 = bReader.readLine();
-                        String line03 = bReader.readLine();
-                        String line04 = bReader.readLine();
-
-                        String fullName = line01;
-                        String email = line02;
-                        int age = Integer.parseInt(line03);
-                        double height = Double.parseDouble(line04);
-
-                        User user = new User(fullName, email, age, height);
-                        users.add(user);
-                    }catch (FileNotFoundException e){
-                        e.printStackTrace();
-                    }catch (IOException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-
         if (mainQuestions.isEmpty()) {
             readQuestions();
         }
@@ -104,6 +76,38 @@ public class SystemManager {
             bWriter.write(String.valueOf(users.get(quantityFile).getHeight()));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void verifyUsers(){
+        String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
+        File directory = new File(folderPath);
+
+        // verifica se já tem usuários cadastrados e caso tenha adiciona ele no List
+        if (directory.exists() && directory.isDirectory()) {
+            File[] txtFiles = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
+            if (txtFiles != null && txtFiles.length > 0){
+                for (int i = 0; i < txtFiles.length; i++) {
+                    try (BufferedReader bReader = new BufferedReader(new FileReader(txtFiles[i]))){
+                        String line01 = bReader.readLine();
+                        String line02 = bReader.readLine();
+                        String line03 = bReader.readLine();
+                        String line04 = bReader.readLine();
+
+                        String fullName = line01;
+                        String email = line02;
+                        int age = Integer.parseInt(line03);
+                        double height = Double.parseDouble(line04);
+
+                        User user = new User(fullName, email, age, height);
+                        users.add(user);
+                    }catch (FileNotFoundException e){
+                        e.printStackTrace();
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 }

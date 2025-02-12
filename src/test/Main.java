@@ -7,6 +7,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         SystemManager systemManager = new SystemManager();
+        systemManager.verifyUsers();
+
         Scanner sc = new Scanner(System.in);
         int choice = 0;
 
@@ -25,6 +27,8 @@ public class Main {
             switch (choice){
                 case 1 -> {
                     systemManager.registerUser();
+                }case 2 -> {
+                    //systemManager.ListUsers();
                 }
                 case 6 -> {
                     System.out.println("Encerrando o programa.");
