@@ -28,7 +28,9 @@ public class Main {
                 case 1 -> {
                     systemManager.registerUser();
                 }case 2 -> {
-                    systemManager.ListUsers();
+                    systemManager.listUsers();
+                }case 3 -> {
+                    systemManager.newQuestion();
                 }
                 case 6 -> {
                     System.out.println("Encerrando o programa.");

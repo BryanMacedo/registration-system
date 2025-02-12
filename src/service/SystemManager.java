@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class SystemManager {
+    List<String> newQuestions = new ArrayList<>();
+    List<String> newAnswer = new ArrayList<>();
     private List<User> users = new ArrayList<>();
     private List<String> mainQuestions = new ArrayList<>();
 
@@ -48,6 +50,15 @@ public class SystemManager {
         System.out.print(mainQuestions.get(3) + " ");
         double height = sc.nextDouble();
         sc.nextLine();
+
+        if (!newQuestions.isEmpty()){
+            int count = 5;
+            for (String newQuestion : newQuestions) {
+                System.out.print(count + " - " + newQuestion + " ");
+                newAnswer.add(sc.nextLine());
+                count++;
+            }
+        }
         System.out.println();
 
         User user = new User(fullName, email, age, height);
@@ -74,6 +85,12 @@ public class SystemManager {
             bWriter.write(String.valueOf(users.get(quantityFile).getAge()));
             bWriter.newLine();
             bWriter.write(String.valueOf(users.get(quantityFile).getHeight()));
+            if (!newQuestions.isEmpty()){
+                for (int i = 0; i < newAnswer.size(); i++) {
+                    bWriter.newLine();
+                    bWriter.write(newAnswer.get(i));
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -111,9 +128,16 @@ public class SystemManager {
         }
     }
 
-    public void ListUsers() {
+    public void listUsers() {
         for (int i = 0; i < users.size(); i++) {
             System.out.println(i + 1 + "-" + users.get(i).getFullName() + "\n");
         }
+    }
+
+    public void newQuestion(){
+        System.out.println("Digite uma nova pergunta:");
+        String newUserQuestion = sc.nextLine();
+
+        newQuestions.add(newUserQuestion);
     }
 }
