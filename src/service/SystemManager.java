@@ -79,16 +79,16 @@ public class SystemManager {
         }
     }
 
-    public void verifyUsers(){
+    public void verifyUsers() {
         String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
         File directory = new File(folderPath);
 
         // verifica se já tem usuários cadastrados e caso tenha adiciona ele no List
         if (directory.exists() && directory.isDirectory()) {
             File[] txtFiles = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
-            if (txtFiles != null && txtFiles.length > 0){
+            if (txtFiles != null && txtFiles.length > 0) {
                 for (int i = 0; i < txtFiles.length; i++) {
-                    try (BufferedReader bReader = new BufferedReader(new FileReader(txtFiles[i]))){
+                    try (BufferedReader bReader = new BufferedReader(new FileReader(txtFiles[i]))) {
                         String line01 = bReader.readLine();
                         String line02 = bReader.readLine();
                         String line03 = bReader.readLine();
@@ -101,13 +101,19 @@ public class SystemManager {
 
                         User user = new User(fullName, email, age, height);
                         users.add(user);
-                    }catch (FileNotFoundException e){
+                    } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                    }catch (IOException e){
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }
+        }
+    }
+
+    public void ListUsers() {
+        for (int i = 0; i < users.size(); i++) {
+            System.out.println(i + 1 + "-" + users.get(i).getFullName() + "\n");
         }
     }
 }
