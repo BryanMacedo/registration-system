@@ -18,7 +18,7 @@ public class Main {
             System.out.println("2 - Listar todos usuários cadastrados.");
             System.out.println("3 - Cadastrar nova pergunta no formulário.");
             System.out.println("4 - Deletar pergunta do formulário.");
-            System.out.println("5 - Pesquisar usuário por nome ou idade ou email.");
+            System.out.println("5 - Pesquisar usuário por nome,idade ou email.");
             System.out.println("6 - Encerrar o programa.");
             System.out.print("Escolha: ");
             choice = sc.nextInt();
@@ -33,6 +33,8 @@ public class Main {
                     systemManager.newQuestion();
                 }case 4 -> {
                     systemManager.deleteNewQuestion();
+                }case 5 -> {
+                    systemManager.searchUser();
                 }
                 case 6 -> {
                     System.out.println("Encerrando o programa.");

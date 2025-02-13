@@ -6,6 +6,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SystemManager {
     List<String> newQuestions = new ArrayList<>();
@@ -38,7 +40,6 @@ public class SystemManager {
             readQuestions();
         }
         System.out.println("--- Cadastrando um usuário ---");
-        sc.nextLine();
         System.out.print(mainQuestions.get(0) + " ");
         String fullName = sc.nextLine();
 
@@ -164,6 +165,56 @@ public class SystemManager {
 
         }
 
+    }
+
+    public void searchUser(){
+        System.out.println("Opções de pesquisa de usuários:");
+        System.out.println("1 - Nome.");
+        System.out.println("2 - Idade.");
+        System.out.println("3 - Email.");
+        System.out.print("Escolha: ");
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        switch (choice){
+            case 1 ->{
+                System.out.print("Digite o nome ou uma parte do nome do usuário que deseja pesquisar: ");
+                String searchString = sc.nextLine().toLowerCase();
+                System.out.println("Cadastros: " );
+                for (User user : users) {
+                    Pattern pattern = Pattern.compile(searchString);
+                    Matcher matcher = pattern.matcher(user.getFullName().toLowerCase());
+                        while (matcher.find()){
+                            System.out.println(user.getFullName());
+                        }
+                }
+                System.out.println();
+            }case 2 ->{
+                System.out.print("Digite a idade do usuário que deseja pesquisar: ");
+                int searchAge = sc.nextInt();
+                System.out.println("Cadastros: " );
+                for (User user : users) {
+                    Pattern pattern = Pattern.compile("\\b" + searchAge + "\\b");
+                    Matcher matcher = pattern.matcher(String.valueOf(user.getAge()));
+                    while (matcher.find()){
+                        System.out.println(user.getFullName() + " - Idade: " + user.getAge());
+                    }
+                }
+                System.out.println();
+            }case 3 ->{
+                System.out.print("Digite o email ou uma parte do email do usuário que deseja pesquisar: ");
+                String searchEmail = sc.nextLine();
+                System.out.println("Cadastros: " );
+                for (User user : users) {
+                    Pattern pattern = Pattern.compile(searchEmail);
+                    Matcher matcher = pattern.matcher(user.getEmail().toLowerCase());
+                    while (matcher.find()){
+                        System.out.println(user.getFullName() + " - Email: " + user.getEmail());
+                    }
+                }
+                System.out.println();
+            }
+        }
     }
 }
 
