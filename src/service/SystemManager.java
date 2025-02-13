@@ -67,7 +67,7 @@ public class SystemManager {
             }
             user.setNewAnswer(answers);
         }
-        System.out.println();
+        System.out.println("\nUsuário cadastrado!\n");
 
 
         if (!directory.exists()) {
