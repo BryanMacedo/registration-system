@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class SystemManager {
     List<String> newQuestions = new ArrayList<>();
-    List<String> newAnswer = new ArrayList<>();
+
     private List<User> users = new ArrayList<>();
     private List<String> mainQuestions = new ArrayList<>();
 
@@ -51,18 +51,22 @@ public class SystemManager {
         double height = sc.nextDouble();
         sc.nextLine();
 
-        if (!newQuestions.isEmpty()){
+        User user = new User(fullName, email, age, height);
+        users.add(user);
+
+        if (!newQuestions.isEmpty()) {
             int count = 5;
+            List<String> answers = new ArrayList<>();
             for (String newQuestion : newQuestions) {
                 System.out.print(count + " - " + newQuestion + " ");
-                newAnswer.add(sc.nextLine());
+                String answer = sc.nextLine();
+                answers.add(answer);
                 count++;
             }
+            user.setNewAnswer(answers);
         }
         System.out.println();
 
-        User user = new User(fullName, email, age, height);
-        users.add(user);
 
         if (!directory.exists()) {
             directory.mkdir();
@@ -85,10 +89,10 @@ public class SystemManager {
             bWriter.write(String.valueOf(users.get(quantityFile).getAge()));
             bWriter.newLine();
             bWriter.write(String.valueOf(users.get(quantityFile).getHeight()));
-            if (!newQuestions.isEmpty()){
-                for (int i = 0; i < newAnswer.size(); i++) {
+            if (!newQuestions.isEmpty()) {
+                for (String answer : user.getNewAnswer()) {
                     bWriter.newLine();
-                    bWriter.write(newAnswer.get(i));
+                    bWriter.write(answer);
                 }
             }
         } catch (IOException e) {
@@ -134,7 +138,7 @@ public class SystemManager {
         }
     }
 
-    public void newQuestion(){
+    public void newQuestion() {
         System.out.println("Digite uma nova pergunta:");
         String newUserQuestion = sc.nextLine();
 

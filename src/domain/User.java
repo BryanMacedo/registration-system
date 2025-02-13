@@ -1,10 +1,13 @@
 package domain;
 
+import java.util.List;
+
 public class User {
     private String fullName;
     private String email;
     private int age;
     private double height;
+    private List<String> newAnswer;
 
     public User() {
     }
@@ -38,5 +41,13 @@ public class User {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public List<String> getNewAnswer() {
+        return newAnswer;
+    }
+
+    public void setNewAnswer(List<String> newAnswer) {
+        this.newAnswer = newAnswer;
     }
 }
