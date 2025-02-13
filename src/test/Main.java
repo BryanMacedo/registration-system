@@ -30,7 +30,9 @@ public class Main {
                 }case 2 -> {
                     systemManager.listUsers();
                 }case 3 -> {
-                    systemManager.newQuestion(); // uma das respostas esta sendo duplicada ao salvar
+                    systemManager.newQuestion();
+                }case 4 -> {
+                    systemManager.deleteNewQuestion();
                 }
                 case 6 -> {
                     System.out.println("Encerrando o programa.");

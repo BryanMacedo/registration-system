@@ -144,4 +144,25 @@ public class SystemManager {
 
         newQuestions.add(newUserQuestion);
     }
+
+    public void deleteNewQuestion() {
+        System.out.print("Informe o número da pergunta que desejá excluir: ");
+        int choice = sc.nextInt();
+
+        if (choice >= 1 && choice <= 4) {
+            System.out.println("Não é possível deletar uma das 4 perguntas originais.");
+        } else {
+            int numberOfNewQuestion = choice - 5;
+            if (numberOfNewQuestion + 1 != newQuestions.size()) {
+                System.out.println("Não existe uma pergunta com este número");
+            } else {
+                System.out.println("Removendo a perfunta: " + newQuestions.get(numberOfNewQuestion));
+                newQuestions.remove(numberOfNewQuestion);
+
+            }
+
+        }
+
+    }
 }
+
