@@ -145,6 +145,7 @@ public class SystemManager {
         String newUserQuestion = sc.nextLine();
 
         newQuestions.add(newUserQuestion);
+        System.out.println("\nNova pergunta adicionada.\n");
     }
 
     public void deleteNewQuestion() {
@@ -158,7 +159,7 @@ public class SystemManager {
             if (numberOfNewQuestion + 1 > newQuestions.size()) {
                 System.out.println("Não existe uma pergunta com este número");
             } else {
-                System.out.println("Removendo a pergunta: " + newQuestions.get(numberOfNewQuestion));
+                System.out.println("Removendo a pergunta: \"" + newQuestions.get(numberOfNewQuestion) +"\"\n");
                 newQuestions.remove(numberOfNewQuestion);
 
             }
