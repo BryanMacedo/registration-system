@@ -38,6 +38,7 @@ public class SystemManager {
             readQuestions();
         }
         System.out.println("--- Cadastrando um usuário ---");
+        sc.nextLine();
         System.out.print(mainQuestions.get(0) + " ");
         String fullName = sc.nextLine();
 
@@ -153,10 +154,10 @@ public class SystemManager {
             System.out.println("Não é possível deletar uma das 4 perguntas originais.");
         } else {
             int numberOfNewQuestion = choice - 5;
-            if (numberOfNewQuestion + 1 != newQuestions.size()) {
+            if (numberOfNewQuestion + 1 > newQuestions.size()) {
                 System.out.println("Não existe uma pergunta com este número");
             } else {
-                System.out.println("Removendo a perfunta: " + newQuestions.get(numberOfNewQuestion));
+                System.out.println("Removendo a pergunta: " + newQuestions.get(numberOfNewQuestion));
                 newQuestions.remove(numberOfNewQuestion);
 
             }
