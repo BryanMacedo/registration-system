@@ -1,10 +1,7 @@
 package service;
 
 import domain.User;
-import exceptions.InvalidEmailFormatException;
-import exceptions.InvalidHeightFormatException;
-import exceptions.NameSmallerThanExpectedException;
-import exceptions.YoungerThanThePermittedAgeException;
+import exceptions.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -62,7 +59,16 @@ public class SystemManager {
                     throw new InvalidEmailFormatException();
                 }
 
-                System.out.print(mainQuestions.get(2) + " ");
+                boolean isEqual = false;
+                for (User findEmails : users) {
+                    isEqual = findEmails.getEmail().equals(email);
+                    if (isEqual){
+                        throw new EmailAlreadyRegisteredException();
+                    }
+                }
+
+                    System.out.print(mainQuestions.get(2) + " ");
+
                 int age = sc.nextInt();
                 sc.nextLine();
 
@@ -91,6 +97,8 @@ public class SystemManager {
                 System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
             }catch (YoungerThanThePermittedAgeException e) {
                 System.out.println("\nVocê não atinge a idade minima para o cadastro, só é permitido o cadastro de usuários com idade maior ou igual a 18.\n");
+            }catch (EmailAlreadyRegisteredException e){
+                System.out.println("\nNão é possível cadastrar dois ou mais usuários com um mesmo email, por favor informe um email que ainda não foi cadastrado.\n");
             }
 
         }
