@@ -4,6 +4,7 @@ import domain.User;
 import exceptions.InvalidEmailFormatException;
 import exceptions.InvalidHeightFormatException;
 import exceptions.NameSmallerThanExpectedException;
+import exceptions.YoungerThanThePermittedAgeException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -65,6 +66,10 @@ public class SystemManager {
                 int age = sc.nextInt();
                 sc.nextLine();
 
+                if (age < 18){
+                    throw new YoungerThanThePermittedAgeException();
+                }
+
                 System.out.print(mainQuestions.get(3) + " ");
                 String strHeight = sc.nextLine();
 
@@ -84,6 +89,8 @@ public class SystemManager {
                 System.out.println("\nFormato de email invalido, seu email deve conter o caractere @.\n");
             } catch (InvalidHeightFormatException e) {
                 System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
+            }catch (YoungerThanThePermittedAgeException e) {
+                System.out.println("\nVocê não atinge a idade minima para o cadastro, só é permitido o cadastro de usuários com idade maior ou igual a 18.\n");
             }
 
         }
