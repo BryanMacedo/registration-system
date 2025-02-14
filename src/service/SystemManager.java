@@ -1,6 +1,7 @@
 package service;
 
 import domain.User;
+import exceptions.InvalidEmailFormatException;
 import exceptions.NameSmallerThanExpectedException;
 
 import java.io.*;
@@ -53,6 +54,11 @@ public class SystemManager {
 
                 System.out.print(mainQuestions.get(1) + " ");
                 String email = sc.nextLine();
+                Pattern pattern = Pattern.compile("@");
+                Matcher matcher = pattern.matcher(email);
+                if (!matcher.find()){
+                    throw new InvalidEmailFormatException();
+                }
 
                 System.out.print(mainQuestions.get(2) + " ");
                 int age = sc.nextInt();
@@ -67,6 +73,8 @@ public class SystemManager {
                 check = false;
             }catch (NameSmallerThanExpectedException e){
                 System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
+            }catch (InvalidEmailFormatException e){
+                System.out.println("Formato de email invalido, seu email deve conter o caractere @.");
             }
 
         }
