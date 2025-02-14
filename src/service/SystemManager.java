@@ -2,6 +2,7 @@ package service;
 
 import domain.User;
 import exceptions.InvalidEmailFormatException;
+import exceptions.InvalidHeightFormatException;
 import exceptions.NameSmallerThanExpectedException;
 
 import java.io.*;
@@ -44,11 +45,11 @@ public class SystemManager {
             readQuestions();
         }
         while (check) {
-            try{
+            try {
                 System.out.println("--- Cadastrando um usuário ---");
                 System.out.print(mainQuestions.get(0) + " ");
                 String fullName = sc.nextLine();
-                if (fullName.length() < 10){
+                if (fullName.length() < 10) {
                     throw new NameSmallerThanExpectedException();
                 }
 
@@ -56,25 +57,33 @@ public class SystemManager {
                 String email = sc.nextLine();
                 Pattern pattern = Pattern.compile("@");
                 Matcher matcher = pattern.matcher(email);
-                if (!matcher.find()){
+                if (!matcher.find()) {
                     throw new InvalidEmailFormatException();
                 }
 
                 System.out.print(mainQuestions.get(2) + " ");
                 int age = sc.nextInt();
+                sc.nextLine();
 
                 System.out.print(mainQuestions.get(3) + " ");
-                double height = sc.nextDouble();
-                sc.nextLine();
+                String strHeight = sc.nextLine();
+
+                if (!strHeight.contains(",")) {
+                    throw new InvalidHeightFormatException();
+                }
+
+                double height = Double.parseDouble(strHeight.replace(",", "."));
 
                 user = new User(fullName, email, age, height);
                 users.add(user);
 
                 check = false;
-            }catch (NameSmallerThanExpectedException e){
+            } catch (NameSmallerThanExpectedException e) {
                 System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
-            }catch (InvalidEmailFormatException e){
-                System.out.println("Formato de email invalido, seu email deve conter o caractere @.");
+            } catch (InvalidEmailFormatException e) {
+                System.out.println("\nFormato de email invalido, seu email deve conter o caractere @.\n");
+            } catch (InvalidHeightFormatException e) {
+                System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
             }
 
         }
