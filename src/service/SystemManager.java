@@ -1,6 +1,7 @@
 package service;
 
 import domain.User;
+import exceptions.NameSmallerThanExpectedException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SystemManager {
+    User user = new User();
     List<String> newQuestions = new ArrayList<>();
 
     private List<User> users = new ArrayList<>();
@@ -33,28 +35,41 @@ public class SystemManager {
     }
 
     public void registerUser() {
+        boolean check = true;
         String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
         File directory = new File(folderPath);
 
         if (mainQuestions.isEmpty()) {
             readQuestions();
         }
-        System.out.println("--- Cadastrando um usuário ---");
-        System.out.print(mainQuestions.get(0) + " ");
-        String fullName = sc.nextLine();
+        while (check) {
+            try{
+                System.out.println("--- Cadastrando um usuário ---");
+                System.out.print(mainQuestions.get(0) + " ");
+                String fullName = sc.nextLine();
+                if (fullName.length() < 10){
+                    throw new NameSmallerThanExpectedException();
+                }
 
-        System.out.print(mainQuestions.get(1) + " ");
-        String email = sc.nextLine();
+                System.out.print(mainQuestions.get(1) + " ");
+                String email = sc.nextLine();
 
-        System.out.print(mainQuestions.get(2) + " ");
-        int age = sc.nextInt();
+                System.out.print(mainQuestions.get(2) + " ");
+                int age = sc.nextInt();
 
-        System.out.print(mainQuestions.get(3) + " ");
-        double height = sc.nextDouble();
-        sc.nextLine();
+                System.out.print(mainQuestions.get(3) + " ");
+                double height = sc.nextDouble();
+                sc.nextLine();
 
-        User user = new User(fullName, email, age, height);
-        users.add(user);
+                user = new User(fullName, email, age, height);
+                users.add(user);
+
+                check = false;
+            }catch (NameSmallerThanExpectedException e){
+                System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
+            }
+
+        }
 
         if (!newQuestions.isEmpty()) {
             int count = 5;
@@ -159,7 +174,7 @@ public class SystemManager {
             if (numberOfNewQuestion + 1 > newQuestions.size()) {
                 System.out.println("Não existe uma pergunta com este número");
             } else {
-                System.out.println("Removendo a pergunta: \"" + newQuestions.get(numberOfNewQuestion) +"\"\n");
+                System.out.println("Removendo a pergunta: \"" + newQuestions.get(numberOfNewQuestion) + "\"\n");
                 newQuestions.remove(numberOfNewQuestion);
 
             }
@@ -168,7 +183,7 @@ public class SystemManager {
 
     }
 
-    public void searchUser(){
+    public void searchUser() {
         System.out.println("Opções de pesquisa de usuários:");
         System.out.println("1 - Nome.");
         System.out.println("2 - Idade.");
@@ -177,39 +192,41 @@ public class SystemManager {
         int choice = sc.nextInt();
         sc.nextLine();
 
-        switch (choice){
-            case 1 ->{
+        switch (choice) {
+            case 1 -> {
                 System.out.print("Digite o nome ou uma parte do nome do usuário que deseja pesquisar: ");
                 String searchString = sc.nextLine().toLowerCase();
-                System.out.println("Cadastros: " );
+                System.out.println("Cadastros: ");
                 for (User user : users) {
                     Pattern pattern = Pattern.compile(searchString);
                     Matcher matcher = pattern.matcher(user.getFullName().toLowerCase());
-                        while (matcher.find()){
-                            System.out.println(user.getFullName());
-                        }
+                    while (matcher.find()) {
+                        System.out.println(user.getFullName());
+                    }
                 }
                 System.out.println();
-            }case 2 ->{
+            }
+            case 2 -> {
                 System.out.print("Digite a idade do usuário que deseja pesquisar: ");
                 int searchAge = sc.nextInt();
-                System.out.println("Cadastros: " );
+                System.out.println("Cadastros: ");
                 for (User user : users) {
                     Pattern pattern = Pattern.compile("\\b" + searchAge + "\\b");
                     Matcher matcher = pattern.matcher(String.valueOf(user.getAge()));
-                    while (matcher.find()){
+                    while (matcher.find()) {
                         System.out.println(user.getFullName() + " - Idade: " + user.getAge());
                     }
                 }
                 System.out.println();
-            }case 3 ->{
+            }
+            case 3 -> {
                 System.out.print("Digite o email ou uma parte do email do usuário que deseja pesquisar: ");
                 String searchEmail = sc.nextLine();
-                System.out.println("Cadastros: " );
+                System.out.println("Cadastros: ");
                 for (User user : users) {
                     Pattern pattern = Pattern.compile(searchEmail);
                     Matcher matcher = pattern.matcher(user.getEmail().toLowerCase());
-                    while (matcher.find()){
+                    while (matcher.find()) {
                         System.out.println(user.getFullName() + " - Email: " + user.getEmail());
                     }
                 }
