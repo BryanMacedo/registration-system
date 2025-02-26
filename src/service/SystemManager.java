@@ -1,9 +1,14 @@
 package service;
 
+import db.DB;
+import db.DbException;
 import domain.User;
 import exceptions.*;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -20,6 +25,9 @@ public class SystemManager {
     Scanner sc = new Scanner(System.in);
 
     public void readQuestions() {
+        Connection conn = null;
+        PreparedStatement st = null;
+
         String pathFormTxt = "D:\\java-estudos\\registration-system\\src\\resource\\formulario.txt";
 
         try (BufferedReader bReader = new BufferedReader(new FileReader(pathFormTxt))) {
@@ -31,6 +39,23 @@ public class SystemManager {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("INSERT INTO questions "+
+                    "(Question) " +
+                    "VALUES " +
+                    "(?)");
+
+            for (int i = 0; i < mainQuestions.size(); i++) {
+                st.setString(1, mainQuestions.get(i));
+                st.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(st);
         }
     }
 
