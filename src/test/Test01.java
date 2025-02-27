@@ -9,6 +9,7 @@ public class Test01 {
     public static void main(String[] args) {
         SystemManager sm = new SystemManager();
 
-        sm.readQuestions();
+        sm.registerUser();
+//        sm.readQuestions();
     }
 }

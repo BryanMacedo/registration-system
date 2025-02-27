@@ -8,6 +8,7 @@ import exceptions.*;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class SystemManager {
 
     private List<User> users = new ArrayList<>();
     private List<String> mainQuestions = new ArrayList<>();
+    private List<String> mainQuestionsDB = new ArrayList<>();
 
     Scanner sc = new Scanner(System.in);
 
@@ -60,23 +62,58 @@ public class SystemManager {
     }
 
     public void registerUser() {
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
         boolean check = true;
+        boolean checkTable = false;
+
         String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
         File directory = new File(folderPath);
 
-        if (mainQuestions.isEmpty()) {
+        try{
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT EXISTS (SELECT 1 FROM questions LIMIT 1)");
+            rs = st.executeQuery();
+            if (rs.next()){
+                checkTable = rs.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+
+        if (!checkTable) {
             readQuestions();
         }
+
+        if (mainQuestionsDB.isEmpty()){
+            try{
+                conn = DB.getConnection();
+                st = conn.prepareStatement("SELECT * FROM questions");
+                rs = st.executeQuery();
+
+                while (rs.next()){
+                    mainQuestionsDB.add(rs.getString("Question"));
+                }
+            } catch (SQLException e) {
+                throw new DbException(e.getMessage());
+            }
+        }
+
         while (check) {
             try {
                 System.out.println("--- Cadastrando um usuário ---");
-                System.out.print(mainQuestions.get(0) + " ");
+                System.out.print(mainQuestionsDB.get(0) + " ");
                 String fullName = sc.nextLine();
                 if (fullName.length() < 10) {
                     throw new NameSmallerThanExpectedException();
                 }
 
-                System.out.print(mainQuestions.get(1) + " ");
+                System.out.print(mainQuestionsDB.get(1) + " ");
                 String email = sc.nextLine();
                 Pattern pattern = Pattern.compile("@");
                 Matcher matcher = pattern.matcher(email);
@@ -92,7 +129,7 @@ public class SystemManager {
                     }
                 }
 
-                    System.out.print(mainQuestions.get(2) + " ");
+                    System.out.print(mainQuestionsDB.get(2) + " ");
 
                 int age = sc.nextInt();
                 sc.nextLine();
@@ -101,7 +138,7 @@ public class SystemManager {
                     throw new YoungerThanThePermittedAgeException();
                 }
 
-                System.out.print(mainQuestions.get(3) + " ");
+                System.out.print(mainQuestionsDB.get(3) + " ");
                 String strHeight = sc.nextLine();
 
                 if (!strHeight.contains(",")) {
@@ -142,7 +179,7 @@ public class SystemManager {
         System.out.println("\nUsuário cadastrado!\n");
 
 
-        if (!directory.exists()) {
+        if (!directory.exists()) { // trocar para salvar no DB
             directory.mkdir();
 
         }
