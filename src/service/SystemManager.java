@@ -45,7 +45,7 @@ public class SystemManager {
 
         try {
             conn = DB.getConnection();
-            st = conn.prepareStatement("INSERT INTO questions "+
+            st = conn.prepareStatement("INSERT INTO questions " +
                     "(Question) " +
                     "VALUES " +
                     "(?)");
@@ -56,7 +56,7 @@ public class SystemManager {
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
-        }finally {
+        } finally {
             DB.closeStatement(st);
         }
     }
@@ -72,16 +72,16 @@ public class SystemManager {
         String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
         File directory = new File(folderPath);
 
-        try{
+        try {
             conn = DB.getConnection();
             st = conn.prepareStatement("SELECT EXISTS (SELECT 1 FROM questions LIMIT 1)");
             rs = st.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 checkTable = rs.getBoolean(1);
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
-        }finally {
+        } finally {
             DB.closeStatement(st);
             DB.closeResultSet(rs);
         }
@@ -90,13 +90,13 @@ public class SystemManager {
             readQuestions();
         }
 
-        if (mainQuestionsDB.isEmpty()){
-            try{
+        if (mainQuestionsDB.isEmpty()) {
+            try {
                 conn = DB.getConnection();
                 st = conn.prepareStatement("SELECT * FROM questions");
                 rs = st.executeQuery();
 
-                while (rs.next()){
+                while (rs.next()) {
                     mainQuestionsDB.add(rs.getString("Question"));
                 }
             } catch (SQLException e) {
@@ -129,12 +129,12 @@ public class SystemManager {
 //                    }
 //                }
 
-                    System.out.print(mainQuestionsDB.get(2) + " ");
+                System.out.print(mainQuestionsDB.get(2) + " ");
 
                 int age = sc.nextInt();
                 sc.nextLine();
 
-                if (age < 18){
+                if (age < 18) {
                     throw new YoungerThanThePermittedAgeException();
                 }
 
@@ -149,7 +149,7 @@ public class SystemManager {
 
                 try {
                     conn = DB.getConnection();
-                    st = conn.prepareStatement("INSERT INTO users "+
+                    st = conn.prepareStatement("INSERT INTO users " +
                             "(FullName, Email, Age, Height) " +
                             "VALUES " +
                             "(?, ?, ?, ?)");
@@ -162,7 +162,7 @@ public class SystemManager {
                     st.executeUpdate();
                 } catch (SQLException e) {
                     throw new DbException(e.getMessage());
-                }finally {
+                } finally {
                     DB.closeStatement(st);
                 }
 
@@ -173,9 +173,9 @@ public class SystemManager {
                 System.out.println("\nFormato de email invalido, seu email deve conter o caractere @.\n");
             } catch (InvalidHeightFormatException e) {
                 System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
-            }catch (YoungerThanThePermittedAgeException e) {
+            } catch (YoungerThanThePermittedAgeException e) {
                 System.out.println("\nVocê não atinge a idade minima para o cadastro, só é permitido o cadastro de usuários com idade maior ou igual a 18.\n");
-            }catch (EmailAlreadyRegisteredException e){
+            } catch (EmailAlreadyRegisteredException e) {
                 System.out.println("\nNão é possível cadastrar dois ou mais usuários com um mesmo email, por favor informe um email que ainda não foi cadastrado.\n");
             }
 
@@ -192,8 +192,6 @@ public class SystemManager {
 //            }
 //            user.setNewAnswer(answers);
 //        } MUDAR A LOGICA DAS PERGUNTAS ADICIONAIS
-
-
 
 
         System.out.println("\nUsuário cadastrado!\n");
@@ -241,7 +239,7 @@ public class SystemManager {
             st = conn.prepareStatement("SELECT * FROM users");
             rs = st.executeQuery();
 
-            while (rs.next()){
+            while (rs.next()) {
                 String fullName = rs.getString("FullName");
                 String email = rs.getString("Email");
                 int age = rs.getInt("Age");
@@ -267,11 +265,25 @@ public class SystemManager {
     }
 
     public void newQuestion() {
+        Connection conn = null;
+        PreparedStatement st = null;
+
         System.out.println("Digite uma nova pergunta:");
         String newUserQuestion = sc.nextLine();
 
-        newQuestions.add(newUserQuestion);
-        System.out.println("\nNova pergunta adicionada.\n");
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("INSERT INTO questions " +
+                    "(Question) " +
+                    "VALUES " +
+                    "(?)");
+            st.setString(1,newUserQuestion);
+            st.executeUpdate();
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(st);
+        }
     }
 
     public void deleteNewQuestion() {

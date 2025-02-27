@@ -9,7 +9,7 @@ public class Test01 {
     public static void main(String[] args) {
         SystemManager sm = new SystemManager();
 
-        sm.listUsers();
+        sm.newQuestion();
 //        sm.readQuestions();
     }
 }
