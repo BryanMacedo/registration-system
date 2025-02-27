@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         SystemManager systemManager = new SystemManager();
-        systemManager.verifyUsers();
+        //systemManager.verifyUsers();
 
         Scanner sc = new Scanner(System.in);
         int choice = 0;
@@ -34,7 +34,7 @@ public class Main {
                 }case 4 -> {
                     systemManager.deleteNewQuestion();
                 }case 5 -> {
-                    systemManager.searchUser();
+                    //systemManager.searchUser();
                 }
                 case 6 -> {
                     System.out.println("Encerrando o programa.");
