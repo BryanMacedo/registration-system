@@ -176,39 +176,27 @@ public class SystemManager {
             }
             user.setNewAnswer(answers);
         }
+
+        // SALVAR USERS NO DB
+
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("INSERT INTO users "+
+                    "(FullName, Email, Age, Height) " +
+                    "VALUES " +
+                    "(?, ?, ?, ?)");
+
+            st.setString(1,user.getFullName());
+            st.setString(2, user.getEmail());
+            st.setInt(3, user.getAge());
+            st.setDouble(4, user.getHeight());
+
+            st.executeUpdate();
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+
         System.out.println("\nUsuário cadastrado!\n");
-
-
-        if (!directory.exists()) { // trocar para salvar no DB
-            directory.mkdir();
-
-        }
-
-        // verifica a quantidade de arquivos txt
-        File[] verifyFiles = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
-        int quantityFile = (verifyFiles != null) ? verifyFiles.length : 0;
-
-        String fileName = (quantityFile + 1 + "-" + users.get(quantityFile).getFullName().toUpperCase() + ".txt").replaceAll(" ", "");
-
-        File userFile = new File(folderPath, fileName);
-
-        try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(userFile))) {
-            bWriter.write(users.get(quantityFile).getFullName());
-            bWriter.newLine();
-            bWriter.write(users.get(quantityFile).getEmail());
-            bWriter.newLine();
-            bWriter.write(String.valueOf(users.get(quantityFile).getAge()));
-            bWriter.newLine();
-            bWriter.write(String.valueOf(users.get(quantityFile).getHeight()));
-            if (!newQuestions.isEmpty()) {
-                for (String answer : user.getNewAnswer()) {
-                    bWriter.newLine();
-                    bWriter.write(answer);
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void verifyUsers() {
