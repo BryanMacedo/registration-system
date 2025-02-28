@@ -287,21 +287,49 @@ public class SystemManager {
     }
 
     public void deleteNewQuestion() {
-        System.out.print("Informe o número da pergunta que desejá excluir: ");
-        int choice = sc.nextInt();
+        // listar todas as perguntas e depois pedir o número da pergunta q ser excluida
+        // se o numero for entre 1 - 4 exibir q não é possivel remover uma das 4 perguntas originais
 
-        if (choice >= 1 && choice <= 4) {
-            System.out.println("Não é possível deletar uma das 4 perguntas originais.");
-        } else {
-            int numberOfNewQuestion = choice - 5;
-            if (numberOfNewQuestion + 1 > newQuestions.size()) {
-                System.out.println("Não existe uma pergunta com este número");
-            } else {
-                System.out.println("Removendo a pergunta: \"" + newQuestions.get(numberOfNewQuestion) + "\"\n");
-                newQuestions.remove(numberOfNewQuestion);
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
+        System.out.println("Listando as perguntas existentes: ");
+
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT * FROM questions");
+            rs = st.executeQuery();
+
+            while (rs.next()){
+                String question = rs.getString("Question");
+                System.out.println(question);
             }
 
+        }catch (SQLException e){
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+
+        System.out.print("\nDigite o número da pergunta que deseja excluir: ");
+        int choice = sc.nextInt();
+
+        if (choice >= 1 && choice <= 4){
+            //criar uma exception especifica
+            throw new DbException("Não é possível excluir uma das 4 perguntas originais.");
+        }
+
+        try {
+            st = conn.prepareStatement("DELETE FROM questions WHERE (Id = ?)");
+            st.setInt(1, choice);
+            st.executeUpdate();
+        }catch (SQLException e){
+            throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
         }
 
     }
