@@ -23,6 +23,9 @@ public class SystemManager {
     private List<User> users = new ArrayList<>();
     private List<String> mainQuestions = new ArrayList<>();
     private List<String> mainQuestionsDB = new ArrayList<>();
+    private List<String> usersName = new ArrayList<>();
+    private List<Integer> usersAge = new ArrayList<>();
+    private List<String> usersEmail = new ArrayList<>();
 
     Scanner sc = new Scanner(System.in);
 
@@ -97,7 +100,7 @@ public class SystemManager {
                 rs = st.executeQuery();
 
                 while (rs.next()) {
-                    mainQuestionsDB.add(rs.getString("Question"));
+                    mainQuestionsDB.add(rs.getString("Main_Questions"));
                 }
             } catch (SQLException e) {
                 throw new DbException(e.getMessage());
@@ -386,60 +389,122 @@ public class SystemManager {
                 DB.closeStatement(st);
             }
         }
-
-        // DELETAR PERGUNTA
     }
 
-//    public void searchUser() {
-//        System.out.println("Opções de pesquisa de usuários:");
-//        System.out.println("1 - Nome.");
-//        System.out.println("2 - Idade.");
-//        System.out.println("3 - Email.");
-//        System.out.print("Escolha: ");
-//        int choice = sc.nextInt();
-//        sc.nextLine();
-//
-//        switch (choice) {
-//            case 1 -> {
-//                System.out.print("Digite o nome ou uma parte do nome do usuário que deseja pesquisar: ");
-//                String searchString = sc.nextLine().toLowerCase();
-//                System.out.println("Cadastros: ");
-//                for (User user : users) {
-//                    Pattern pattern = Pattern.compile(searchString);
-//                    Matcher matcher = pattern.matcher(user.getFullName().toLowerCase());
-//                    while (matcher.find()) {
-//                        System.out.println(user.getFullName());
-//                    }
-//                }
-//                System.out.println();
-//            }
-//            case 2 -> {
-//                System.out.print("Digite a idade do usuário que deseja pesquisar: ");
-//                int searchAge = sc.nextInt();
-//                System.out.println("Cadastros: ");
-//                for (User user : users) {
-//                    Pattern pattern = Pattern.compile("\\b" + searchAge + "\\b");
-//                    Matcher matcher = pattern.matcher(String.valueOf(user.getAge()));
-//                    while (matcher.find()) {
-//                        System.out.println(user.getFullName() + " - Idade: " + user.getAge());
-//                    }
-//                }
-//                System.out.println();
-//            }
-//            case 3 -> {
-//                System.out.print("Digite o email ou uma parte do email do usuário que deseja pesquisar: ");
-//                String searchEmail = sc.nextLine();
-//                System.out.println("Cadastros: ");
-//                for (User user : users) {
-//                    Pattern pattern = Pattern.compile(searchEmail);
-//                    Matcher matcher = pattern.matcher(user.getEmail().toLowerCase());
-//                    while (matcher.find()) {
-//                        System.out.println(user.getFullName() + " - Email: " + user.getEmail());
-//                    }
-//                }
-//                System.out.println();
-//            }
-//        }
-//    }
+    public void searchUser() {
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        System.out.println("Opções de pesquisa de usuários:");
+        System.out.println("1 - Nome.");
+        System.out.println("2 - Idade.");
+        System.out.println("3 - Email.");
+        System.out.print("Escolha: ");
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        switch (choice) {
+            case 1 -> {
+                System.out.print("Digite o nome ou uma parte do nome do usuário que deseja pesquisar: ");
+                String searchString = sc.nextLine().toLowerCase();
+                System.out.println("Cadastros: ");
+                try{
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("SELECT * FROM users WHERE FullName LIKE ?");
+                    st.setString(1,"%" + searchString + "%");
+                    rs = st.executeQuery();
+
+                    while (rs.next()){
+                        usersName.add(rs.getString("FullName"));
+                    }
+
+                    if (usersName.isEmpty()){
+                        System.out.println("Não foi encontrado nenhum usuário com o nome " + searchString);
+                    }else {
+                        int i = 1;
+                        for (String names : usersName) {
+                            System.out.println(i + " - " + names);
+                            i++;
+                        }
+                    }
+                }catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                } finally {
+                    DB.closeStatement(st);
+                    DB.closeResultSet(rs);
+                }
+                System.out.println();
+            }
+            case 2 -> {
+                System.out.print("Digite a idade do usuário que deseja pesquisar: ");
+                int searchAge = sc.nextInt();
+                System.out.println("Cadastros: ");
+
+                try{
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("SELECT * FROM users WHERE Age = ?");
+                    st.setInt(1,searchAge);
+                    rs = st.executeQuery();
+
+                    while (rs.next()){
+                        usersAge.add(rs.getInt("Age"));
+                        usersName.add(rs.getString("FullName"));
+                    }
+
+                    if (usersAge.isEmpty()){
+                        System.out.println("Não foi encontrado nenhum usuário com a idade " + searchAge);
+                    }else {
+                        int i = 1;
+                        for (int j = 0; j < usersAge.size() ; j++) {
+                            System.out.println(i + " - " + usersName.get(j) + " - " +  "Idade: " + usersAge.get(j));
+                            i++;
+                        }
+                    }
+                }catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                } finally {
+                    DB.closeStatement(st);
+                    DB.closeResultSet(rs);
+                }
+
+                System.out.println();
+            }
+            case 3 -> {
+                System.out.print("Digite o email ou uma parte do email do usuário que deseja pesquisar: ");
+                String searchEmail = sc.nextLine();
+                System.out.println("Cadastros: ");
+
+                try{
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("SELECT * FROM users WHERE Email LIKE ?");
+                    st.setString(1,"%" + searchEmail + "%");
+                    rs = st.executeQuery();
+
+                    while (rs.next()){
+                        usersEmail.add(rs.getString("Email"));
+                        usersName.add(rs.getString("FullName"));
+                    }
+
+                    if (usersEmail.isEmpty()){
+                        System.out.println("Não foi encontrado nenhum usuário com o email " + searchEmail);
+                    }else {
+                        int i = 1;
+                        for (int j = 0; j < usersEmail.size() ; j++) {
+                            System.out.println(i + " - " + usersName.get(j) + " - " +  "Email: " + usersEmail.get(j));
+                            i++;
+                        }
+                    }
+                }catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                } finally {
+                    DB.closeStatement(st);
+                    DB.closeResultSet(rs);
+                }
+
+                System.out.println();
+            }
+        }
+    }
 }
 
