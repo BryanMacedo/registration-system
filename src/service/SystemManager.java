@@ -269,6 +269,27 @@ public class SystemManager {
         PreparedStatement st = null;
         ResultSet rs = null;
 
+        try{
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT COUNT(*) FROM additional_questions");
+            rs = st.executeQuery();
+
+            int countLine = 0;
+            if (rs.next()){
+                countLine = rs.getInt(1);
+            }
+
+            if (countLine >= 3){
+                // criar uma exception especifica
+                throw new DbException("Limite de perguntas cadastradas atingida, exclua uma pergunta para cadastrar outra.");
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+
         System.out.println("Digite uma nova pergunta:");
         String newUserQuestion = sc.nextLine();
 
@@ -289,60 +310,84 @@ public class SystemManager {
     }
 
    public void deleteNewQuestion() {
-//        Connection conn = null;
-//        PreparedStatement st = null;
-//        ResultSet rs = null;
-//
-//        System.out.println("Listando as perguntas existentes: ");
-//
-//        try {
-//            conn = DB.getConnection();
-//            st = conn.prepareStatement("SELECT * FROM questions");
-//            rs = st.executeQuery();
-//
-//            while (rs.next()) {
-//                String question = rs.getString("Question");
-//                System.out.println(question);
-//            }
-//
-//        } catch (SQLException e) {
-//            throw new DbException(e.getMessage());
-//        } finally {
-//            DB.closeStatement(st);
-//            DB.closeResultSet(rs);
-//        }
-//
-//        System.out.print("\nDigite o número da pergunta que deseja excluir: ");
-//        int choice = sc.nextInt();
-//
-//        if (choice >= 1 && choice <= 4) {
-//            //criar uma exception especifica
-//            throw new DbException("Não é possível excluir uma das 4 perguntas originais.");
-//        }
-//
-//        try {
-//            st = conn.prepareStatement("SELECT Id FROM questions ORDER BY id ASC LIMIT ?");
-//            st.setInt(1, choice);
-//            rs = st.executeQuery();
-//
-//
-//            if(rs.last()){
-//                int idToDelete = rs.getInt("Id");
-//
-//                if (idToDelete != 0){
-//                    st = conn.prepareStatement("DELETE FROM questions WHERE Id = ?");
-//                    st.setInt(1, idToDelete);
-//                    st.executeUpdate();
-//                }
-//            }
-//
-//
-//        } catch (SQLException e) {
-//            throw new DbException(e.getMessage());
-//        } finally {
-//            DB.closeStatement(st);
-//            DB.closeResultSet(rs);
-//        }
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        System.out.println("Listando as perguntas existentes: ");
+
+        // perguntas principais
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT * FROM questions");
+            rs = st.executeQuery();
+
+            while (rs.next()) {
+                String question = rs.getString("Main_Questions");
+                System.out.println(question);
+            }
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+
+        //perguntas adicionais
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT * FROM additional_questions ");
+            rs = st.executeQuery();
+
+            while (rs.next()){
+                newQuestions.add(rs.getString("Users_questions"));
+            }
+
+            int lineCounter = 5;
+            for (String newQuestion : newQuestions) {
+                System.out.println(lineCounter + " - " + newQuestion);
+                lineCounter++;
+            }
+        }catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+
+        System.out.print("\nDigite o número da pergunta que deseja excluir: ");
+        int choice = sc.nextInt();
+
+        if (choice >= 1 && choice <= 4) {
+            //criar uma exception especifica
+            throw new DbException("Não é possível excluir uma das 4 perguntas originais.");
+        }else{
+            choice -= 4; // subtrai o número de perguntas principais
+            choice -= 1; // subtrai 1 pq o offset começa em 0
+
+            try {
+                conn =DB.getConnection();
+                st = conn.prepareStatement("SELECT Id FROM additional_questions ORDER BY Id LIMIT 1 OFFSET ?");
+                st.setInt(1,choice);
+                rs = st.executeQuery();
+
+                int idToDelete = 0;
+                if (rs.next()){
+                    idToDelete = rs.getInt("Id");
+                }
+
+                st = conn.prepareStatement("DELETE FROM additional_questions WHERE Id = ?");
+                st.setInt(1, idToDelete);
+                st.executeUpdate();
+            }catch (SQLException e) {
+                throw new DbException(e.getMessage());
+            } finally {
+                DB.closeStatement(st);
+            }
+        }
+
+        // DELETAR PERGUNTA
     }
 
 //    public void searchUser() {
