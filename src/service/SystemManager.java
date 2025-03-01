@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 public class SystemManager {
     User user = new User();
     List<String> newQuestions = new ArrayList<>();
+    List<String> newAnswer = new ArrayList<>();
 
     private List<User> users = new ArrayList<>();
     private List<String> mainQuestions = new ArrayList<>();
@@ -65,6 +66,7 @@ public class SystemManager {
     }
 
     public void registerUser() {
+        int userId = 0;
         Connection conn = null;
         PreparedStatement st = null;
         ResultSet rs = null;
@@ -125,16 +127,16 @@ public class SystemManager {
                     throw new InvalidEmailFormatException();
                 }
 
-                try{
+                try {
                     conn = DB.getConnection();
                     st = conn.prepareStatement("SELECT COUNT(*) FROM users WHERE Email = ?");
                     st.setString(1, email);
                     rs = st.executeQuery();
 
-                    if (rs.next()){
+                    if (rs.next()) {
                         int countEmail = rs.getInt(1);
 
-                        if (countEmail > 0){
+                        if (countEmail > 0) {
                             throw new EmailAlreadyRegisteredException();
                         }
                     }
@@ -177,6 +179,14 @@ public class SystemManager {
                     st.setDouble(4, height);
 
                     st.executeUpdate();
+
+                    st = conn.prepareStatement("SELECT Id FROM users WHERE FullName = ?");
+                    st.setString(1, fullName);
+                    rs = st.executeQuery();
+
+                    if (rs.next()){
+                        userId = rs.getInt("Id");
+                    }
                 } catch (SQLException e) {
                     throw new DbException(e.getMessage());
                 } finally {
@@ -196,6 +206,58 @@ public class SystemManager {
                 System.out.println("\nNão é possível cadastrar dois ou mais usuários com um mesmo email, por favor informe um email que ainda não foi cadastrado.\n");
             }
 
+        }
+
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT EXISTS (SELECT 1 FROM additional_questions LIMIT 1)");
+            rs = st.executeQuery();
+            if (rs.next()) {
+                checkTable = rs.getBoolean(1);
+            }
+
+            if (checkTable){
+                st = conn.prepareStatement("SELECT * FROM additional_questions");
+                rs = st.executeQuery();
+
+                while (rs.next()) {
+                    newQuestions.add(rs.getString("Users_questions"));
+                }
+
+                int lineCounter = 5;
+                for (String newQuestion : newQuestions) {
+                    System.out.print(lineCounter + " - " + newQuestion);
+                    String answer = sc.nextLine();
+                    newAnswer.add(answer);
+                    lineCounter++;
+                }
+
+                if (newQuestions.size() == 3){
+                    st = conn.prepareStatement("INSERT INTO additional_answers (Answer01, Answer02, Answer03, User_Id) VALUES (?,?,?,?)");
+                    st.setString(1, newAnswer.get(0));
+                    st.setString(2, newAnswer.get(1));
+                    st.setString(3, newAnswer.get(2));
+                    st.setInt(4, userId);
+                    st.executeUpdate();
+                } else if (newQuestions.size() == 2) {
+                    st = conn.prepareStatement("INSERT INTO additional_answers (Answer01, Answer02, User_Id) VALUES (?,?,?)");
+                    st.setString(1, newAnswer.get(0));
+                    st.setString(2, newAnswer.get(1));
+                    st.setInt(3, userId);
+                    st.executeUpdate();
+                } else if (newQuestions.size() == 1) {
+                    st = conn.prepareStatement("INSERT INTO additional_answers (Answer01, User_Id) VALUES (?,?)");
+                    st.setString(1, newAnswer.get(0));
+                    st.setInt(2, userId);
+                    st.executeUpdate();
+                }
+            }
+
+        }catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
         }
 
 //        if (!newQuestions.isEmpty()) {
@@ -286,17 +348,17 @@ public class SystemManager {
         PreparedStatement st = null;
         ResultSet rs = null;
 
-        try{
+        try {
             conn = DB.getConnection();
             st = conn.prepareStatement("SELECT COUNT(*) FROM additional_questions");
             rs = st.executeQuery();
 
             int countLine = 0;
-            if (rs.next()){
+            if (rs.next()) {
                 countLine = rs.getInt(1);
             }
 
-            if (countLine >= 3){
+            if (countLine >= 3) {
                 // criar uma exception especifica
                 throw new DbException("Limite de perguntas cadastradas atingida, exclua uma pergunta para cadastrar outra.");
             }
@@ -326,7 +388,7 @@ public class SystemManager {
         }
     }
 
-   public void deleteNewQuestion() {
+    public void deleteNewQuestion() {
         Connection conn = null;
         PreparedStatement st = null;
         ResultSet rs = null;
@@ -357,7 +419,7 @@ public class SystemManager {
             st = conn.prepareStatement("SELECT * FROM additional_questions ");
             rs = st.executeQuery();
 
-            while (rs.next()){
+            while (rs.next()) {
                 newQuestions.add(rs.getString("Users_questions"));
             }
 
@@ -366,7 +428,7 @@ public class SystemManager {
                 System.out.println(lineCounter + " - " + newQuestion);
                 lineCounter++;
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {
             DB.closeStatement(st);
@@ -379,25 +441,25 @@ public class SystemManager {
         if (choice >= 1 && choice <= 4) {
             //criar uma exception especifica
             throw new DbException("Não é possível excluir uma das 4 perguntas originais.");
-        }else{
+        } else {
             choice -= 4; // subtrai o número de perguntas principais
             choice -= 1; // subtrai 1 pq o offset começa em 0
 
             try {
-                conn =DB.getConnection();
+                conn = DB.getConnection();
                 st = conn.prepareStatement("SELECT Id FROM additional_questions ORDER BY Id LIMIT 1 OFFSET ?");
-                st.setInt(1,choice);
+                st.setInt(1, choice);
                 rs = st.executeQuery();
 
                 int idToDelete = 0;
-                if (rs.next()){
+                if (rs.next()) {
                     idToDelete = rs.getInt("Id");
                 }
 
                 st = conn.prepareStatement("DELETE FROM additional_questions WHERE Id = ?");
                 st.setInt(1, idToDelete);
                 st.executeUpdate();
-            }catch (SQLException e) {
+            } catch (SQLException e) {
                 throw new DbException(e.getMessage());
             } finally {
                 DB.closeStatement(st);
@@ -423,26 +485,26 @@ public class SystemManager {
                 System.out.print("Digite o nome ou uma parte do nome do usuário que deseja pesquisar: ");
                 String searchString = sc.nextLine().toLowerCase();
                 System.out.println("Cadastros: ");
-                try{
+                try {
                     conn = DB.getConnection();
                     st = conn.prepareStatement("SELECT * FROM users WHERE FullName LIKE ?");
-                    st.setString(1,"%" + searchString + "%");
+                    st.setString(1, "%" + searchString + "%");
                     rs = st.executeQuery();
 
-                    while (rs.next()){
+                    while (rs.next()) {
                         usersName.add(rs.getString("FullName"));
                     }
 
-                    if (usersName.isEmpty()){
+                    if (usersName.isEmpty()) {
                         System.out.println("Não foi encontrado nenhum usuário com o nome " + searchString);
-                    }else {
+                    } else {
                         int i = 1;
                         for (String names : usersName) {
                             System.out.println(i + " - " + names);
                             i++;
                         }
                     }
-                }catch (SQLException e) {
+                } catch (SQLException e) {
                     throw new DbException(e.getMessage());
                 } finally {
                     DB.closeStatement(st);
@@ -455,27 +517,27 @@ public class SystemManager {
                 int searchAge = sc.nextInt();
                 System.out.println("Cadastros: ");
 
-                try{
+                try {
                     conn = DB.getConnection();
                     st = conn.prepareStatement("SELECT * FROM users WHERE Age = ?");
-                    st.setInt(1,searchAge);
+                    st.setInt(1, searchAge);
                     rs = st.executeQuery();
 
-                    while (rs.next()){
+                    while (rs.next()) {
                         usersAge.add(rs.getInt("Age"));
                         usersName.add(rs.getString("FullName"));
                     }
 
-                    if (usersAge.isEmpty()){
+                    if (usersAge.isEmpty()) {
                         System.out.println("Não foi encontrado nenhum usuário com a idade " + searchAge);
-                    }else {
+                    } else {
                         int i = 1;
-                        for (int j = 0; j < usersAge.size() ; j++) {
-                            System.out.println(i + " - " + usersName.get(j) + " - " +  "Idade: " + usersAge.get(j));
+                        for (int j = 0; j < usersAge.size(); j++) {
+                            System.out.println(i + " - " + usersName.get(j) + " - " + "Idade: " + usersAge.get(j));
                             i++;
                         }
                     }
-                }catch (SQLException e) {
+                } catch (SQLException e) {
                     throw new DbException(e.getMessage());
                 } finally {
                     DB.closeStatement(st);
@@ -489,27 +551,27 @@ public class SystemManager {
                 String searchEmail = sc.nextLine();
                 System.out.println("Cadastros: ");
 
-                try{
+                try {
                     conn = DB.getConnection();
                     st = conn.prepareStatement("SELECT * FROM users WHERE Email LIKE ?");
-                    st.setString(1,"%" + searchEmail + "%");
+                    st.setString(1, "%" + searchEmail + "%");
                     rs = st.executeQuery();
 
-                    while (rs.next()){
+                    while (rs.next()) {
                         usersEmail.add(rs.getString("Email"));
                         usersName.add(rs.getString("FullName"));
                     }
 
-                    if (usersEmail.isEmpty()){
+                    if (usersEmail.isEmpty()) {
                         System.out.println("Não foi encontrado nenhum usuário com o email " + searchEmail);
-                    }else {
+                    } else {
                         int i = 1;
-                        for (int j = 0; j < usersEmail.size() ; j++) {
-                            System.out.println(i + " - " + usersName.get(j) + " - " +  "Email: " + usersEmail.get(j));
+                        for (int j = 0; j < usersEmail.size(); j++) {
+                            System.out.println(i + " - " + usersName.get(j) + " - " + "Email: " + usersEmail.get(j));
                             i++;
                         }
                     }
-                }catch (SQLException e) {
+                } catch (SQLException e) {
                     throw new DbException(e.getMessage());
                 } finally {
                     DB.closeStatement(st);
