@@ -75,7 +75,7 @@ public class SystemManager {
         String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
         File directory = new File(folderPath);
 
-        try {
+        try { // verifica se tem as principais perguntas cadastradas
             conn = DB.getConnection();
             st = conn.prepareStatement("SELECT EXISTS (SELECT 1 FROM questions LIMIT 1)");
             rs = st.executeQuery();
@@ -118,19 +118,33 @@ public class SystemManager {
 
                 System.out.print(mainQuestionsDB.get(1) + " ");
                 String email = sc.nextLine();
+
                 Pattern pattern = Pattern.compile("@");
                 Matcher matcher = pattern.matcher(email);
                 if (!matcher.find()) {
                     throw new InvalidEmailFormatException();
                 }
 
-                boolean isEqual = false;
-//                for (User findEmails : users) {
-//                    isEqual = findEmails.getEmail().equals(email);
-//                    if (isEqual){
-//                        throw new EmailAlreadyRegisteredException();
-//                    }
-//                }
+                try{
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("SELECT COUNT(*) FROM users WHERE Email = ?");
+                    st.setString(1, email);
+                    rs = st.executeQuery();
+
+                    if (rs.next()){
+                        int countEmail = rs.getInt(1);
+
+                        if (countEmail > 0){
+                            throw new EmailAlreadyRegisteredException();
+                        }
+                    }
+
+                } catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                } finally {
+                    DB.closeStatement(st);
+                    DB.closeResultSet(rs);
+                }
 
                 System.out.print(mainQuestionsDB.get(2) + " ");
 
