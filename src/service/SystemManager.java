@@ -4,6 +4,7 @@ import db.DB;
 import exceptions.dbException.DbException;
 import domain.User;
 import exceptions.dbException.NumberOfQuestionsReachedTheLimitException;
+import exceptions.dbException.UnauthorizedQuestionDeletionAttemptException;
 import exceptions.validationExceptions.*;
 
 import java.io.*;
@@ -350,6 +351,13 @@ public class SystemManager {
                 System.out.println("Digite uma nova pergunta:");
                 String newUserQuestion = sc.nextLine();
 
+                Pattern pattern = Pattern.compile("\\?");
+                Matcher matcher = pattern.matcher(newUserQuestion);
+
+                if (!matcher.find()){
+                    throw new InvalidQuestionFormatException();
+                }
+
                 try {
                     conn = DB.getConnection();
                     st = conn.prepareStatement("INSERT INTO additional_questions " +
@@ -370,7 +378,10 @@ public class SystemManager {
             throw new DbException(e.getMessage());
         } catch (NumberOfQuestionsReachedTheLimitException e){
             System.out.println("Limite de perguntas cadastradas atingida, exclua uma pergunta para cadastrar outra.\n");
+        }catch (InvalidQuestionFormatException e){
+            System.out.println("\nFormato de pergunta invalida, todas as perguntas devem conter o sinal de interrogação (\\?)\n");
         }
+
         finally{
             DB.closeStatement(st);
             DB.closeResultSet(rs);
