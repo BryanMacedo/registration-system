@@ -1,4 +1,4 @@
-package db;
+package exceptions.dbException;
 
 import java.io.Serial;
 

@@ -1,9 +1,10 @@
 package service;
 
 import db.DB;
-import db.DbException;
+import exceptions.dbException.DbException;
 import domain.User;
-import exceptions.*;
+import exceptions.dbException.NumberOfQuestionsReachedTheLimitException;
+import exceptions.validationExceptions.*;
 
 import java.io.*;
 import java.sql.Connection;
@@ -74,9 +75,6 @@ public class SystemManager {
 
         boolean check = true;
         boolean checkTable = false;
-
-        String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
-        File directory = new File(folderPath);
 
         try { // verifica se tem as principais perguntas cadastradas
             conn = DB.getConnection();
@@ -345,12 +343,14 @@ public class SystemManager {
             }
 
             if (countLine >= 3) {
-                // criar uma exception especifica
-                throw new DbException("Limite de perguntas cadastradas atingida, exclua uma pergunta para cadastrar outra.");
+                throw new NumberOfQuestionsReachedTheLimitException();
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
-        } finally {
+        } catch (NumberOfQuestionsReachedTheLimitException e){
+            System.out.println("Limite de perguntas cadastradas atingida, exclua uma pergunta para cadastrar outra.\n");
+        }
+        finally{
             DB.closeStatement(st);
             DB.closeResultSet(rs);
         }
