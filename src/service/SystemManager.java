@@ -325,6 +325,8 @@ public class SystemManager {
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         }
+
+        System.out.println();
     }
 
     public void newQuestion() {
@@ -344,6 +346,25 @@ public class SystemManager {
 
             if (countLine >= 3) {
                 throw new NumberOfQuestionsReachedTheLimitException();
+            }else{
+                System.out.println("Digite uma nova pergunta:");
+                String newUserQuestion = sc.nextLine();
+
+                try {
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("INSERT INTO additional_questions " +
+                            "(Users_questions) " +
+                            "VALUES " +
+                            "(?)");
+                    st.setString(1, newUserQuestion);
+                    st.executeUpdate();
+                } catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                } finally {
+                    DB.closeStatement(st);
+                }
+
+                System.out.println("\nPergunta cadastrada.\n");
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -355,23 +376,6 @@ public class SystemManager {
             DB.closeResultSet(rs);
         }
 
-        System.out.println("Digite uma nova pergunta:");
-        String newUserQuestion = sc.nextLine();
-
-
-        try {
-            conn = DB.getConnection();
-            st = conn.prepareStatement("INSERT INTO additional_questions " +
-                    "(Users_questions) " +
-                    "VALUES " +
-                    "(?)");
-            st.setString(1, newUserQuestion);
-            st.executeUpdate();
-        } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
-        }
     }
 
     public void deleteNewQuestion() {
@@ -453,6 +457,8 @@ public class SystemManager {
                 DB.closeStatement(st);
             }
         }
+
+        System.out.println("\nPergunta excluída.\n");
     }
 
     public void searchUser() {
