@@ -221,6 +221,7 @@ public class SystemManager {
                 st = conn.prepareStatement("SELECT * FROM additional_questions");
                 rs = st.executeQuery();
 
+                newQuestions.clear();
                 while (rs.next()) {
                     newQuestions.add(rs.getString("Users_questions"));
                 }
@@ -312,6 +313,7 @@ public class SystemManager {
                                 System.out.println(answer);
                             }
                         }
+                        additionalAnswersUser.clear();
                     }
                 }catch (SQLException e){
                     throw new DbException(e.getMessage());
@@ -403,6 +405,7 @@ public class SystemManager {
             st = conn.prepareStatement("SELECT * FROM additional_questions ");
             rs = st.executeQuery();
 
+            newQuestions.clear();
             while (rs.next()) {
                 newQuestions.add(rs.getString("Users_questions"));
             }
@@ -421,6 +424,7 @@ public class SystemManager {
 
         System.out.print("\nDigite o número da pergunta que deseja excluir: ");
         int choice = sc.nextInt();
+        sc.nextLine();
 
         if (choice >= 1 && choice <= 4) {
             //criar uma exception especifica
