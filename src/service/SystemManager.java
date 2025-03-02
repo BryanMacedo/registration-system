@@ -430,35 +430,40 @@ public class SystemManager {
         int choice = sc.nextInt();
         sc.nextLine();
 
-        if (choice >= 1 && choice <= 4) {
-            //criar uma exception especifica
-            throw new DbException("Não é possível excluir uma das 4 perguntas originais.");
-        } else {
-            choice -= 4; // subtrai o número de perguntas principais
-            choice -= 1; // subtrai 1 pq o offset começa em 0
+        try {
+            if (choice >= 1 && choice <= 4) {
+                //criar uma exception especifica
+                throw new UnauthorizedQuestionDeletionAttemptException();
+            } else {
 
-            try {
-                conn = DB.getConnection();
-                st = conn.prepareStatement("SELECT Id FROM additional_questions ORDER BY Id LIMIT 1 OFFSET ?");
-                st.setInt(1, choice);
-                rs = st.executeQuery();
+                choice -= 4; // subtrai o número de perguntas principais
+                choice -= 1; // subtrai 1 pq o offset começa em 0
 
-                int idToDelete = 0;
-                if (rs.next()) {
-                    idToDelete = rs.getInt("Id");
+                try {
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("SELECT Id FROM additional_questions ORDER BY Id LIMIT 1 OFFSET ?");
+                    st.setInt(1, choice);
+                    rs = st.executeQuery();
+
+                    int idToDelete = 0;
+                    if (rs.next()) {
+                        idToDelete = rs.getInt("Id");
+                    }
+
+                    st = conn.prepareStatement("DELETE FROM additional_questions WHERE Id = ?");
+                    st.setInt(1, idToDelete);
+                    st.executeUpdate();
+                } catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                } finally {
+                    DB.closeStatement(st);
                 }
-
-                st = conn.prepareStatement("DELETE FROM additional_questions WHERE Id = ?");
-                st.setInt(1, idToDelete);
-                st.executeUpdate();
-            } catch (SQLException e) {
-                throw new DbException(e.getMessage());
-            } finally {
-                DB.closeStatement(st);
+                System.out.println("\nPergunta excluída.\n");
             }
+        } catch (UnauthorizedQuestionDeletionAttemptException e){
+            System.out.println("\nNão é possível excluir uma das 4 perguntas originais.\n");
         }
 
-        System.out.println("\nPergunta excluída.\n");
     }
 
     public void searchUser() {
