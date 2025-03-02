@@ -20,6 +20,7 @@ public class SystemManager {
     User user = new User();
     List<String> newQuestions = new ArrayList<>();
     List<String> newAnswer = new ArrayList<>();
+    List<String> additionalAnswersUser = new ArrayList<>();
 
     private List<User> users = new ArrayList<>();
     private List<String> mainQuestions = new ArrayList<>();
@@ -184,7 +185,7 @@ public class SystemManager {
                     st.setString(1, fullName);
                     rs = st.executeQuery();
 
-                    if (rs.next()){
+                    if (rs.next()) {
                         userId = rs.getInt("Id");
                     }
                 } catch (SQLException e) {
@@ -216,7 +217,7 @@ public class SystemManager {
                 checkTable = rs.getBoolean(1);
             }
 
-            if (checkTable){
+            if (checkTable) {
                 st = conn.prepareStatement("SELECT * FROM additional_questions");
                 rs = st.executeQuery();
 
@@ -232,7 +233,7 @@ public class SystemManager {
                     lineCounter++;
                 }
 
-                if (newQuestions.size() == 3){
+                if (newQuestions.size() == 3) {
                     st = conn.prepareStatement("INSERT INTO additional_answers (Answer01, Answer02, Answer03, User_Id) VALUES (?,?,?,?)");
                     st.setString(1, newAnswer.get(0));
                     st.setString(2, newAnswer.get(1));
@@ -253,60 +254,15 @@ public class SystemManager {
                 }
             }
 
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {
             DB.closeStatement(st);
             DB.closeResultSet(rs);
         }
 
-//        if (!newQuestions.isEmpty()) {
-//            int count = 5;
-//            List<String> answers = new ArrayList<>();
-//            for (String newQuestion : newQuestions) {
-//                System.out.print(count + " - " + newQuestion + " ");
-//                String answer = sc.nextLine();
-//                answers.add(answer);
-//                count++;
-//            }
-//            user.setNewAnswer(answers);
-//        } MUDAR A LOGICA DAS PERGUNTAS ADICIONAIS
-
-
         System.out.println("\nUsuário cadastrado!\n");
     }
-
-//    public void verifyUsers() {
-//        String folderPath = "D:\\java-estudos\\registration-system\\src\\userDirectory";
-//        File directory = new File(folderPath);
-//
-//        // verifica se já tem usuários cadastrados e caso tenha adiciona ele no List
-//        if (directory.exists() && directory.isDirectory()) {
-//            File[] txtFiles = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
-//            if (txtFiles != null && txtFiles.length > 0) {
-//                for (int i = 0; i < txtFiles.length; i++) {
-//                    try (BufferedReader bReader = new BufferedReader(new FileReader(txtFiles[i]))) {
-//                        String line01 = bReader.readLine();
-//                        String line02 = bReader.readLine();
-//                        String line03 = bReader.readLine();
-//                        String line04 = bReader.readLine();
-//
-//                        String fullName = line01;
-//                        String email = line02;
-//                        int age = Integer.parseInt(line03);
-//                        double height = Double.parseDouble(line04);
-//
-//                        User user = new User(fullName, email, age, height);
-//                        users.add(user);
-//                    } catch (FileNotFoundException e) {
-//                        e.printStackTrace();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     public void listUsers() {
         Connection conn = null;
@@ -323,8 +279,9 @@ public class SystemManager {
                 String email = rs.getString("Email");
                 int age = rs.getInt("Age");
                 double height = rs.getDouble("Height");
+                int userId = rs.getInt("Id");
 
-                User userDB = new User(fullName, email, age, height);
+                User userDB = new User(fullName, email, age, height, userId);
                 users.add(userDB);
 
 
@@ -335,6 +292,33 @@ public class SystemManager {
                 System.out.println(user.getEmail());
                 System.out.println(user.getAge());
                 System.out.println(user.getHeight());
+                try{
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("SELECT * FROM additional_answers WHERE User_Id = ?");
+                    st.setInt(1, user.getUserId());
+                    rs = st.executeQuery();
+
+                    if (rs.next()){
+                        String answer01 = rs.getString("Answer01");
+                        String answer02 = rs.getString("Answer02");
+                        String answer03 = rs.getString("Answer03");
+
+                        additionalAnswersUser.add(answer01);
+                        additionalAnswersUser.add(answer02);
+                        additionalAnswersUser.add(answer03);
+
+                        for (String answer : additionalAnswersUser) {
+                            if (answer != null){
+                                System.out.println(answer);
+                            }
+                        }
+                    }
+                }catch (SQLException e){
+                    throw new DbException(e.getMessage());
+                }finally {
+                    DB.closeStatement(st);
+                    DB.closeResultSet(rs);
+                }
                 System.out.println("-------------------------------");
             }
 

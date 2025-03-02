@@ -8,15 +8,17 @@ public class User {
     private int age;
     private double height;
     private List<String> newAnswer;
+    int userId;
 
     public User() {
     }
 
-    public User(String fullName, String email, int age, double height) {
+    public User(String fullName, String email, int age, double height, int userId) {
         this.fullName = fullName;
         this.email = email;
         this.age = age;
         this.height = height;
+        this.userId = userId;
     }
 
     @Override
@@ -25,6 +27,11 @@ public class User {
                 "\nE-mail: " + this.email +
                 "\nIdade: " + this.age +
                 "\nAltura: " + this.height;
+    }
+
+
+    public int getUserId() {
+        return userId;
     }
 
     public double getHeight() {
