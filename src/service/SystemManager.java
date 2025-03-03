@@ -121,7 +121,9 @@ public class SystemManager {
                 System.out.print(mainQuestionsDB.get(1) + " ");
                 String email = sc.nextLine();
 
-                Pattern pattern = Pattern.compile("@");
+
+                Pattern pattern = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" +
+                        "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
                 Matcher matcher = pattern.matcher(email);
                 if (!matcher.find()) {
                     throw new InvalidEmailFormatException();
@@ -197,7 +199,7 @@ public class SystemManager {
             } catch (NameSmallerThanExpectedException e) {
                 System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
             } catch (InvalidEmailFormatException e) {
-                System.out.println("\nFormato de email invalido, seu email deve conter o caractere @.\n");
+                System.out.println("\nFormato de email invalido, digite um email no seguinte formato \"usuario@gmail.com\".\n");
             } catch (InvalidHeightFormatException e) {
                 System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
             } catch (YoungerThanThePermittedAgeException e) {
