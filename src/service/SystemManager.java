@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -199,13 +200,16 @@ public class SystemManager {
             } catch (NameSmallerThanExpectedException e) {
                 System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
             } catch (InvalidEmailFormatException e) {
-                System.out.println("\nFormato de email invalido, digite um email no seguinte formato \"usuario@gmail.com\".\n");
+                System.out.println("\nFormato de email invalido, seu email deve ser informado no seguinte formato: \"usuario@gmail.com\".\n");
             } catch (InvalidHeightFormatException e) {
                 System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
             } catch (YoungerThanThePermittedAgeException e) {
                 System.out.println("\nVocê não atinge a idade minima para o cadastro, só é permitido o cadastro de usuários com idade maior ou igual a 18.\n");
             } catch (EmailAlreadyRegisteredException e) {
                 System.out.println("\nNão é possível cadastrar dois ou mais usuários com um mesmo email, por favor informe um email que ainda não foi cadastrado.\n");
+            }catch (InputMismatchException e){
+                sc.nextLine();
+                System.out.println("\nOpção invalida, por favor informe apenas números no campo de idade.\n");
             }
 
         }
