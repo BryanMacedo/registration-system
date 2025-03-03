@@ -353,12 +353,14 @@ public class SystemManager {
                 System.out.println("Digite uma nova pergunta:");
                 String newUserQuestion = sc.nextLine();
 
-                Pattern pattern = Pattern.compile("\\?");
+
+                Pattern pattern = Pattern.compile("^[\\wÁ-ÿ\\s,;:.!?()-]+\\?$");
                 Matcher matcher = pattern.matcher(newUserQuestion);
 
                 if (!matcher.find()){
                     throw new InvalidQuestionFormatException();
                 }
+                newUserQuestion = newUserQuestion + " ";
 
                 try {
                     conn = DB.getConnection();
@@ -381,7 +383,7 @@ public class SystemManager {
         } catch (NumberOfQuestionsReachedTheLimitException e){
             System.out.println("Limite de perguntas cadastradas atingida, exclua uma pergunta para cadastrar outra.\n");
         }catch (InvalidQuestionFormatException e){
-            System.out.println("\nFormato de pergunta invalida, todas as perguntas devem conter o sinal de interrogação (\\?)\n");
+            System.out.println("\nFormato de pergunta invalida, todas as perguntas devem seguir o seguinte formato \"Sua pergunta?\".\n");
         }
 
         finally{
