@@ -207,7 +207,7 @@ public class SystemManager {
                 System.out.println("\nVocê não atinge a idade minima para o cadastro, só é permitido o cadastro de usuários com idade maior ou igual a 18.\n");
             } catch (EmailAlreadyRegisteredException e) {
                 System.out.println("\nNão é possível cadastrar dois ou mais usuários com um mesmo email, por favor informe um email que ainda não foi cadastrado.\n");
-            }catch (InputMismatchException e){
+            } catch (InputMismatchException e) {
                 sc.nextLine();
                 System.out.println("\nOpção invalida, por favor informe apenas números no campo de idade.\n");
             }
@@ -298,13 +298,13 @@ public class SystemManager {
                 System.out.println(user.getEmail());
                 System.out.println(user.getAge());
                 System.out.println(user.getHeight());
-                try{
+                try {
                     conn = DB.getConnection();
                     st = conn.prepareStatement("SELECT * FROM additional_answers WHERE User_Id = ?");
                     st.setInt(1, user.getUserId());
                     rs = st.executeQuery();
 
-                    if (rs.next()){
+                    if (rs.next()) {
                         String answer01 = rs.getString("Answer01");
                         String answer02 = rs.getString("Answer02");
                         String answer03 = rs.getString("Answer03");
@@ -314,15 +314,15 @@ public class SystemManager {
                         additionalAnswersUser.add(answer03);
 
                         for (String answer : additionalAnswersUser) {
-                            if (answer != null){
+                            if (answer != null) {
                                 System.out.println(answer);
                             }
                         }
                         additionalAnswersUser.clear();
                     }
-                }catch (SQLException e){
+                } catch (SQLException e) {
                     throw new DbException(e.getMessage());
-                }finally {
+                } finally {
                     DB.closeStatement(st);
                     DB.closeResultSet(rs);
                 }
@@ -353,7 +353,7 @@ public class SystemManager {
 
             if (countLine >= 3) {
                 throw new NumberOfQuestionsReachedTheLimitException();
-            }else{
+            } else {
                 System.out.println("Digite uma nova pergunta:");
                 String newUserQuestion = sc.nextLine();
 
@@ -361,7 +361,7 @@ public class SystemManager {
                 Pattern pattern = Pattern.compile("^[\\wÁ-ÿ\\s,;:.!?()-]+\\?$");
                 Matcher matcher = pattern.matcher(newUserQuestion);
 
-                if (!matcher.find()){
+                if (!matcher.find()) {
                     throw new InvalidQuestionFormatException();
                 }
                 newUserQuestion = newUserQuestion + " ";
@@ -384,13 +384,11 @@ public class SystemManager {
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
-        } catch (NumberOfQuestionsReachedTheLimitException e){
+        } catch (NumberOfQuestionsReachedTheLimitException e) {
             System.out.println("Limite de perguntas cadastradas atingida, exclua uma pergunta para cadastrar outra.\n");
-        }catch (InvalidQuestionFormatException e){
-            System.out.println("\nFormato de pergunta invalida, todas as perguntas devem seguir o seguinte formato \"Sua pergunta?\".\n");
-        }
-
-        finally{
+        } catch (InvalidQuestionFormatException e) {
+            System.out.println("\nFormato de pergunta invalida, todas as perguntas devem seguir o seguinte formato: \"Sua pergunta?\".\n");
+        } finally {
             DB.closeStatement(st);
             DB.closeResultSet(rs);
         }
@@ -479,7 +477,7 @@ public class SystemManager {
                 }
                 System.out.println("\nPergunta excluída.\n");
             }
-        } catch (UnauthorizedQuestionDeletionAttemptException e){
+        } catch (UnauthorizedQuestionDeletionAttemptException e) {
             System.out.println("\nNão é possível excluir uma das 4 perguntas originais.\n");
         }
 
@@ -600,5 +598,109 @@ public class SystemManager {
             }
         }
     }
+
+    public void editUser() {
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        int id = 0;
+
+        System.out.println("Listando usuários cadastrados:");
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT * FROM users");
+            rs = st.executeQuery();
+            while (rs.next()) {
+                usersName.add(rs.getString("FullName"));
+            }
+
+            int i = 1;
+            for (int j = 0; j < usersName.size(); j++) {
+                System.out.println(i + " - " + usersName.get(j));
+                i++;
+            }
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+
+        System.out.print("\nDigite o número do usuário que deseja editar: ");
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        choice -= 1; // subtrai 1 pq o offset começa pelo 0
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT Id FROM users ORDER BY Id LIMIT 1 OFFSET ?");
+            st.setInt(1, choice);
+            rs = st.executeQuery();
+
+            if (rs.next()) {
+                id = rs.getInt("Id");
+            }
+
+            st = conn.prepareStatement("SELECT * FROM users WHERE ID = ?");
+            st.setInt(1, id);
+            rs = st.executeQuery();
+
+            String currentName = null;
+            String currentEmail = null;
+            int currentAge = 0;
+            String currentHeight = null;
+            if (rs.next()){
+                currentName = rs.getString("FullName");
+                currentEmail = rs.getString("Email");
+                currentAge = rs.getInt("Age");
+                currentHeight = rs.getString("Height");
+
+            }
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+
+        System.out.println("\nOpções de campos do usuário para editar:");
+        System.out.println("1 - Nome.");
+        System.out.println("2 - Email.");
+        System.out.println("3 - Idade.");
+        System.out.println("4 - Altura.");
+        System.out.print("Escolha: ");
+        int editChoice = sc.nextInt();
+        sc.nextLine();
+
+        switch (editChoice) {
+            case 1 -> {
+
+                System.out.print("Digite um novo nome: ");
+                String NewFullName = sc.nextLine();
+                try {
+                    if (NewFullName.length() < 10) {
+                        throw new NameSmallerThanExpectedException();
+                    }
+                    // verificar se o nome atual é igual ao novo nome
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("UPDATE users SET FullName = ? WHERE Id = ?");
+                    st.setString(1, NewFullName);
+                    st.setInt(2, id);
+                    st.executeUpdate();
+
+                    System.out.println("\nNome do usuário editado.\n");
+
+                } catch (NameSmallerThanExpectedException e) {
+                    System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
+                }catch (SQLException e){
+                    throw new DbException(e.getMessage());
+                }
+            }
+            case 2 -> {
+            }
+            case 3 -> {
+            }
+            case 4 -> {
+            }
+        }
+    }
+
+    ;
 }
 
