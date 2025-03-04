@@ -609,11 +609,12 @@ public class SystemManager {
         Connection conn = null;
         PreparedStatement st = null;
         ResultSet rs = null;
+
         int id = 0;
         String currentName = null;
         String currentEmail = null;
         int currentAge = 0;
-        String currentHeight = null;
+        double currentHeight = 0;
 
         System.out.println("Listando usuários cadastrados:");
         usersName.clear();
@@ -662,7 +663,7 @@ public class SystemManager {
                 currentName = rs.getString("FullName");
                 currentEmail = rs.getString("Email");
                 currentAge = rs.getInt("Age");
-                currentHeight = rs.getString("Height");
+                currentHeight = rs.getDouble("Height");
             }
 
         } catch (SQLException e) {
@@ -776,6 +777,36 @@ public class SystemManager {
                 }
             }
             case 4 -> {
+                System.out.print("\nDigite uma nova altura: ");
+                String newStrHeight = sc.nextLine();
+
+                try {
+                    if (!newStrHeight.contains(",")) {
+                        throw new InvalidHeightFormatException();
+                    }
+
+                    double newHeight = Double.parseDouble(newStrHeight.replace(",", "."));
+
+                    if (Double.compare(newHeight, currentHeight) == 0){
+                        throw new SameHeightExceptions();
+                    }
+
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("UPDATE users SET Height = ? WHERE Id = ?");
+                    st.setDouble(1, newHeight);
+                    st.setInt(2, id);
+                    st.executeUpdate();
+
+                    System.out.println("\nAltura do usuário editada.\n");
+                }catch (InvalidHeightFormatException e) {
+                    System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
+                } catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                }catch (SameHeightExceptions e){
+                    System.out.println("\nEdição invalida, por favor insira uma altura diferente da altura já cadastrada.\n");
+                } finally {
+                    DB.closeStatement(st);
+                }
             }
         }
     }
