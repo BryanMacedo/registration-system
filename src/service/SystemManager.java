@@ -613,10 +613,6 @@ public class SystemManager {
         User userToEdit = null;
 
         int id = 0;
-        String currentName = null;
-        String currentEmail = null;
-        int currentAge = 0;
-        double currentHeight = 0;
 
         System.out.println("Listando usuários cadastrados:");
         usersName.clear();
@@ -764,7 +760,7 @@ public class SystemManager {
                 sc.nextLine();
 
                 try {
-                    if (newAge == currentAge) {
+                    if (newAge == userToEdit.getAge()) {
                         throw new SameAgesExceptions();
                     }
 
@@ -795,7 +791,7 @@ public class SystemManager {
 
                     double newHeight = Double.parseDouble(newStrHeight.replace(",", "."));
 
-                    if (Double.compare(newHeight, currentHeight) == 0) {
+                    if (Double.compare(newHeight, userToEdit.getHeight()) == 0) {
                         throw new SameHeightExceptions();
                     }
 
