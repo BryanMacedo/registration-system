@@ -610,6 +610,10 @@ public class SystemManager {
         PreparedStatement st = null;
         ResultSet rs = null;
         int id = 0;
+        String currentName = null;
+        String currentEmail = null;
+        int currentAge = 0;
+        String currentHeight = null;
 
         System.out.println("Listando usuários cadastrados:");
         usersName.clear();
@@ -653,10 +657,7 @@ public class SystemManager {
             st.setInt(1, id);
             rs = st.executeQuery();
 
-            String currentName = null;
-            String currentEmail = null;
-            int currentAge = 0;
-            String currentHeight = null;
+
             if (rs.next()) {
                 currentName = rs.getString("FullName");
                 currentEmail = rs.getString("Email");
@@ -682,7 +683,7 @@ public class SystemManager {
 
         switch (editChoice) {
             case 1 -> {
-                System.out.print("Digite um novo nome: ");
+                System.out.print("\nDigite um novo nome: ");
                 String NewFullName = sc.nextLine();
                 try {
                     if (NewFullName.length() < 10) {
@@ -706,7 +707,7 @@ public class SystemManager {
                 }
             }
             case 2 -> {
-                System.out.print("Digite um novo email: ");
+                System.out.print("\nDigite um novo email: ");
                 String newEmail = sc.nextLine();
 
 
@@ -750,6 +751,29 @@ public class SystemManager {
                 }
             }
             case 3 -> {
+                System.out.print("\nDigite uma nova idade: ");
+                int newAge = sc.nextInt();
+                sc.nextLine();
+
+                try {
+                    if (newAge == currentAge){
+                        throw new SameAgesExceptions();
+                    }
+
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("UPDATE users SET Age = ? WHERE Id = ?");
+                    st.setInt(1, newAge);
+                    st.setInt(2, id);
+                    st.executeUpdate();
+
+                    System.out.println("\nIdade do usuário editada.\n");
+                }catch (SameAgesExceptions e){
+                    System.out.println("\nEdição invalida, por favor insira uma idade diferente da idade já cadastrada.\n");
+                } catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                }finally {
+                    DB.closeStatement(st);
+                }
             }
             case 4 -> {
             }
