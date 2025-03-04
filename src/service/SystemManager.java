@@ -686,15 +686,17 @@ public class SystemManager {
             case 1 -> {
                 System.out.println("\nNome atual: " + userToEdit.getFullName());
                 System.out.print("Digite um novo nome: ");
-                String NewFullName = sc.nextLine();
+                String newFullName = sc.nextLine();
                 try {
-                    if (NewFullName.length() < 10) {
+                    if (newFullName.length() < 10) {
                         throw new NameSmallerThanExpectedException();
                     }
-                    // verificar se o nome atual é igual ao novo nome
+                    if (newFullName.equals(userToEdit.getFullName())){
+                        throw new SameNamesExceptions();
+                    }
                     conn = DB.getConnection();
                     st = conn.prepareStatement("UPDATE users SET FullName = ? WHERE Id = ?");
-                    st.setString(1, NewFullName);
+                    st.setString(1, newFullName);
                     st.setInt(2, id);
                     st.executeUpdate();
 
@@ -704,7 +706,9 @@ public class SystemManager {
                     System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
                 } catch (SQLException e) {
                     throw new DbException(e.getMessage());
-                } finally {
+                } catch (SameNamesExceptions e){
+                    System.out.println("\nEdição invalida, por favor insira um nome diferente do nome já cadastrada.\n");
+                }finally {
                     DB.closeStatement(st);
                 }
             }
