@@ -278,59 +278,20 @@ public class SystemManager {
         ResultSet rs = null;
 
         try {
+            usersName.clear();
+
             conn = DB.getConnection();
             st = conn.prepareStatement("SELECT * FROM users");
             rs = st.executeQuery();
-
             while (rs.next()) {
-                String fullName = rs.getString("FullName");
-                String email = rs.getString("Email");
-                int age = rs.getInt("Age");
-                double height = rs.getDouble("Height");
-                int userId = rs.getInt("Id");
-
-                User userDB = new User(fullName, email, age, height, userId);
-                users.add(userDB);
-
-
+                usersName.add(rs.getString("FullName"));
             }
 
-            for (User user : users) {
-                System.out.println(user.getFullName());
-                System.out.println(user.getEmail());
-                System.out.println(user.getAge());
-                System.out.println(user.getHeight());
-                try {
-                    conn = DB.getConnection();
-                    st = conn.prepareStatement("SELECT * FROM additional_answers WHERE User_Id = ?");
-                    st.setInt(1, user.getUserId());
-                    rs = st.executeQuery();
-
-                    if (rs.next()) {
-                        String answer01 = rs.getString("Answer01");
-                        String answer02 = rs.getString("Answer02");
-                        String answer03 = rs.getString("Answer03");
-
-                        additionalAnswersUser.add(answer01);
-                        additionalAnswersUser.add(answer02);
-                        additionalAnswersUser.add(answer03);
-
-                        for (String answer : additionalAnswersUser) {
-                            if (answer != null) {
-                                System.out.println(answer);
-                            }
-                        }
-                        additionalAnswersUser.clear();
-                    }
-                } catch (SQLException e) {
-                    throw new DbException(e.getMessage());
-                } finally {
-                    DB.closeStatement(st);
-                    DB.closeResultSet(rs);
-                }
-                System.out.println("-------------------------------");
+            int i = 1;
+            for (int j = 0; j < usersName.size(); j++) {
+                System.out.println(i + " - " + usersName.get(j));
+                i++;
             }
-
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         } finally {
@@ -687,7 +648,7 @@ public class SystemManager {
                     if (newFullName.length() < 10) {
                         throw new NameSmallerThanExpectedException();
                     }
-                    if (newFullName.equals(userToEdit.getFullName())){
+                    if (newFullName.equals(userToEdit.getFullName())) {
                         throw new SameNamesExceptions();
                     }
                     conn = DB.getConnection();
@@ -702,9 +663,9 @@ public class SystemManager {
                     System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
                 } catch (SQLException e) {
                     throw new DbException(e.getMessage());
-                } catch (SameNamesExceptions e){
+                } catch (SameNamesExceptions e) {
                     System.out.println("\nEdição invalida, por favor insira um nome diferente do nome já cadastrada.\n");
-                }finally {
+                } finally {
                     DB.closeStatement(st);
                 }
             }
