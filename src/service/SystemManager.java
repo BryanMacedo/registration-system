@@ -49,6 +49,8 @@ public class SystemManager {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            DB.closeStatement(st);
         }
 
         try {
@@ -331,6 +333,9 @@ public class SystemManager {
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
         }
 
         System.out.println();
@@ -474,6 +479,7 @@ public class SystemManager {
                     throw new DbException(e.getMessage());
                 } finally {
                     DB.closeStatement(st);
+                    DB.closeResultSet(rs);
                 }
                 System.out.println("\nPergunta excluída.\n");
             }
@@ -606,6 +612,7 @@ public class SystemManager {
         int id = 0;
 
         System.out.println("Listando usuários cadastrados:");
+        usersName.clear();
         try {
             conn = DB.getConnection();
             st = conn.prepareStatement("SELECT * FROM users");
@@ -622,6 +629,9 @@ public class SystemManager {
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
         }
 
         System.out.print("\nDigite o número do usuário que deseja editar: ");
@@ -647,16 +657,18 @@ public class SystemManager {
             String currentEmail = null;
             int currentAge = 0;
             String currentHeight = null;
-            if (rs.next()){
+            if (rs.next()) {
                 currentName = rs.getString("FullName");
                 currentEmail = rs.getString("Email");
                 currentAge = rs.getInt("Age");
                 currentHeight = rs.getString("Height");
-
             }
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
         }
 
         System.out.println("\nOpções de campos do usuário para editar:");
@@ -670,7 +682,6 @@ public class SystemManager {
 
         switch (editChoice) {
             case 1 -> {
-
                 System.out.print("Digite um novo nome: ");
                 String NewFullName = sc.nextLine();
                 try {
@@ -688,11 +699,55 @@ public class SystemManager {
 
                 } catch (NameSmallerThanExpectedException e) {
                     System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
-                }catch (SQLException e){
+                } catch (SQLException e) {
                     throw new DbException(e.getMessage());
+                } finally {
+                    DB.closeStatement(st);
                 }
             }
             case 2 -> {
+                System.out.print("Digite um novo email: ");
+                String newEmail = sc.nextLine();
+
+
+                Pattern pattern = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" +
+                        "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+                Matcher matcher = pattern.matcher(newEmail);
+                try {
+                    if (!matcher.find()) {
+                        throw new InvalidEmailFormatException();
+                    }
+
+                    conn = DB.getConnection();
+                    st = conn.prepareStatement("SELECT COUNT(*) FROM users WHERE Email = ?");
+                    st.setString(1, newEmail);
+
+                    rs = st.executeQuery();
+
+                    if (rs.next()) {
+                        int countEmail = rs.getInt(1);
+
+                        if (countEmail > 0) {
+                            throw new EmailAlreadyRegisteredException();
+                        }
+                    }
+
+                    st = conn.prepareStatement("UPDATE users SET Email = ? WHERE Id = ?");
+                    st.setString(1, newEmail);
+                    st.setInt(2, id);
+                    st.executeUpdate();
+
+                    System.out.println("\nEmail do usuário editado.\n");
+                } catch (InvalidEmailFormatException e) {
+                    System.out.println("\nFormato de email invalido, seu email deve ser informado no seguinte formato: \"usuario@gmail.com\".\n");
+                } catch (SQLException e) {
+                    throw new DbException(e.getMessage());
+                } catch (EmailAlreadyRegisteredException e) {
+                    System.out.println("\nNão é possível cadastrar dois ou mais usuários com um mesmo email, por favor informe um email que ainda não foi cadastrado.\n");
+                } finally {
+                    DB.closeStatement(st);
+                    DB.closeResultSet(rs);
+                }
             }
             case 3 -> {
             }
