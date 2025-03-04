@@ -610,6 +610,8 @@ public class SystemManager {
         PreparedStatement st = null;
         ResultSet rs = null;
 
+        User userToEdit = null;
+
         int id = 0;
         String currentName = null;
         String currentEmail = null;
@@ -660,10 +662,8 @@ public class SystemManager {
 
 
             if (rs.next()) {
-                currentName = rs.getString("FullName");
-                currentEmail = rs.getString("Email");
-                currentAge = rs.getInt("Age");
-                currentHeight = rs.getDouble("Height");
+                userToEdit = new User(rs.getString("FullName"), rs.getString("Email"),
+                        +rs.getInt("Age"), rs.getDouble("Height"), rs.getInt("Id"));
             }
 
         } catch (SQLException e) {
@@ -684,7 +684,8 @@ public class SystemManager {
 
         switch (editChoice) {
             case 1 -> {
-                System.out.print("\nDigite um novo nome: ");
+                System.out.println("\nNome atual: " + userToEdit.getFullName());
+                System.out.print("Digite um novo nome: ");
                 String NewFullName = sc.nextLine();
                 try {
                     if (NewFullName.length() < 10) {
@@ -708,7 +709,8 @@ public class SystemManager {
                 }
             }
             case 2 -> {
-                System.out.print("\nDigite um novo email: ");
+                System.out.println("\nEmail atual: " + userToEdit.getEmail());
+                System.out.print("Digite um novo email: ");
                 String newEmail = sc.nextLine();
 
 
@@ -752,12 +754,13 @@ public class SystemManager {
                 }
             }
             case 3 -> {
-                System.out.print("\nDigite uma nova idade: ");
+                System.out.println("\nIdade atual: " + userToEdit.getAge());
+                System.out.print("Digite uma nova idade: ");
                 int newAge = sc.nextInt();
                 sc.nextLine();
 
                 try {
-                    if (newAge == currentAge){
+                    if (newAge == currentAge) {
                         throw new SameAgesExceptions();
                     }
 
@@ -768,16 +771,17 @@ public class SystemManager {
                     st.executeUpdate();
 
                     System.out.println("\nIdade do usuário editada.\n");
-                }catch (SameAgesExceptions e){
+                } catch (SameAgesExceptions e) {
                     System.out.println("\nEdição invalida, por favor insira uma idade diferente da idade já cadastrada.\n");
                 } catch (SQLException e) {
                     throw new DbException(e.getMessage());
-                }finally {
+                } finally {
                     DB.closeStatement(st);
                 }
             }
             case 4 -> {
-                System.out.print("\nDigite uma nova altura: ");
+                System.out.println("\nAltura atual: " + userToEdit.getHeight());
+                System.out.print("Digite uma nova altura: ");
                 String newStrHeight = sc.nextLine();
 
                 try {
@@ -787,7 +791,7 @@ public class SystemManager {
 
                     double newHeight = Double.parseDouble(newStrHeight.replace(",", "."));
 
-                    if (Double.compare(newHeight, currentHeight) == 0){
+                    if (Double.compare(newHeight, currentHeight) == 0) {
                         throw new SameHeightExceptions();
                     }
 
@@ -798,11 +802,11 @@ public class SystemManager {
                     st.executeUpdate();
 
                     System.out.println("\nAltura do usuário editada.\n");
-                }catch (InvalidHeightFormatException e) {
+                } catch (InvalidHeightFormatException e) {
                     System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
                 } catch (SQLException e) {
                     throw new DbException(e.getMessage());
-                }catch (SameHeightExceptions e){
+                } catch (SameHeightExceptions e) {
                     System.out.println("\nEdição invalida, por favor insira uma altura diferente da altura já cadastrada.\n");
                 } finally {
                     DB.closeStatement(st);
@@ -810,7 +814,5 @@ public class SystemManager {
             }
         }
     }
-
-    ;
 }
 
