@@ -12,7 +12,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         int choice = 0;
 
-        while (choice != 7){
+        while (choice != 8){
             System.out.println("--- SISTEMA DE CADASTRO ---");
             System.out.println("1 - Cadastrar o usuário.");
             System.out.println("2 - Listar todos usuários cadastrados.");
@@ -20,7 +20,8 @@ public class Main {
             System.out.println("4 - Deletar pergunta do formulário.");
             System.out.println("5 - Pesquisar usuário por nome,idade ou email.");
             System.out.println("6 - Editar informações do usuário.");
-            System.out.println("7 - Encerrar o programa.");
+            System.out.println("7 - Exibir todas as informações de um usuário.");
+            System.out.println("8 - Encerrar o programa.");
             System.out.print("Escolha: ");
             choice = sc.nextInt();
             System.out.println();
@@ -38,8 +39,10 @@ public class Main {
                     systemManager.searchUser();
                 }case 6 -> {
                     systemManager.editUser();
+                }case 7 -> {
+                    systemManager.showUserData();
                 }
-                case 7 -> {
+                case 8 -> {
                     System.out.println("Encerrando o programa.");
                 }
             }

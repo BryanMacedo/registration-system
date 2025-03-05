@@ -775,5 +775,71 @@ public class SystemManager {
             }
         }
     }
+
+    public void showUserData() {
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        int id = 0;
+
+        User userToShow = null;
+
+
+        System.out.println("Listando usuários cadastrados:");
+        usersName.clear();
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT * FROM users");
+            rs = st.executeQuery();
+            while (rs.next()) {
+                usersName.add(rs.getString("FullName"));
+            }
+
+            int i = 1;
+            for (int j = 0; j < usersName.size(); j++) {
+                System.out.println(i + " - " + usersName.get(j));
+                i++;
+            }
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+
+        System.out.print("\nDigite o número do usuário que deseja visualizar as informações: ");
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        choice -= 1; // subtrai 1 pq o offset começa pelo 0
+
+        try {
+            conn = DB.getConnection();
+            st = conn.prepareStatement("SELECT Id FROM users ORDER BY Id LIMIT 1 OFFSET ?");
+            st.setInt(1, choice);
+            rs = st.executeQuery();
+
+            if (rs.next()) {
+                id = rs.getInt("Id");
+            }
+
+            st = conn.prepareStatement("SELECT * FROM users WHERE ID = ?");
+            st.setInt(1, id);
+            rs = st.executeQuery();
+
+
+            if (rs.next()) {
+                userToShow = new User(rs.getString("FullName"), rs.getString("Email"),
+                        +rs.getInt("Age"), rs.getDouble("Height"), rs.getInt("Id"));
+            }
+
+            System.out.println("\n" + userToShow + "\n");
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+    }
 }
 
