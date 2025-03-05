@@ -274,6 +274,8 @@ public class SystemManager {
         PreparedStatement st = null;
         ResultSet rs = null;
 
+        System.out.println("Listando Usuários cadastrados: ");
+
         try {
             usersName.clear();
 
@@ -572,30 +574,9 @@ public class SystemManager {
 
         int id = 0;
 
-        System.out.println("Listando usuários cadastrados:");
-        usersName.clear();
-        try {
-            conn = DB.getConnection();
-            st = conn.prepareStatement("SELECT * FROM users");
-            rs = st.executeQuery();
-            while (rs.next()) {
-                usersName.add(rs.getString("FullName"));
-            }
+        listUsers();
 
-            int i = 1;
-            for (int j = 0; j < usersName.size(); j++) {
-                System.out.println(i + " - " + usersName.get(j));
-                i++;
-            }
-
-        } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
-        }
-
-        System.out.print("\nDigite o número do usuário que deseja editar: ");
+        System.out.print("Digite o número do usuário que deseja editar: ");
         int choice = sc.nextInt();
         sc.nextLine();
 
@@ -782,31 +763,9 @@ public class SystemManager {
 
         User userToShow = null;
 
+        listUsers();
 
-        System.out.println("Listando usuários cadastrados:");
-        usersName.clear();
-        try {
-            conn = DB.getConnection();
-            st = conn.prepareStatement("SELECT * FROM users");
-            rs = st.executeQuery();
-            while (rs.next()) {
-                usersName.add(rs.getString("FullName"));
-            }
-
-            int i = 1;
-            for (int j = 0; j < usersName.size(); j++) {
-                System.out.println(i + " - " + usersName.get(j));
-                i++;
-            }
-
-        } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
-        }
-
-        System.out.print("\nDigite o número do usuário que deseja visualizar as informações: ");
+        System.out.print("Digite o número do usuário que deseja visualizar as informações: ");
         int choice = sc.nextInt();
         sc.nextLine();
 
