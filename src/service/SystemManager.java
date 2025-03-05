@@ -12,10 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -835,10 +832,41 @@ public class SystemManager {
                         +rs.getInt("Age"), rs.getDouble("Height"), rs.getInt("Id"));
             }
 
-            System.out.println("\n" + userToShow + "\n");
+            System.out.println("\nPrincipais informações: ");
+            System.out.println(userToShow);
 
+            st = conn.prepareStatement("SELECT * FROM additional_answers WHERE User_Id = ? ");
+            st.setInt(1, id);
+            rs = st.executeQuery();
+
+            additionalAnswersUser.clear();
+            if (rs.next()){
+                additionalAnswersUser.add(rs.getString("Answer01"));
+                additionalAnswersUser.add(rs.getString("Answer02"));
+                additionalAnswersUser.add(rs.getString("Answer03"));
+            }
+
+            additionalAnswersUser.removeIf(Objects::isNull);
+
+            if (!additionalAnswersUser.isEmpty()){
+                System.out.println("Informações adicionais: ");
+                Iterator<String> iterator = additionalAnswersUser.iterator();
+
+                while (iterator.hasNext()){
+                    System.out.print(iterator.next());
+                    if (iterator.hasNext()){
+                        System.out.print(" - ");
+                    }
+                }
+
+                System.out.println();
+            }
+            System.out.println();
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
+        }finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
         }
     }
 }
