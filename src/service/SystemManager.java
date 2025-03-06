@@ -630,17 +630,25 @@ public class SystemManager {
                         throw new SameNamesExceptions();
                     }
                     conn = DB.getConnection();
+                    conn.setAutoCommit(false);
+
                     st = conn.prepareStatement("UPDATE users SET FullName = ? WHERE Id = ?");
                     st.setString(1, newFullName);
                     st.setInt(2, id);
                     st.executeUpdate();
 
+                    conn.commit();
                     System.out.println("\nNome do usuário editado.\n");
 
                 } catch (NameSmallerThanExpectedException e) {
                     System.out.println("\nTamanho de nome invalido, seu nome deve ter no mínimo 10 caracteres.\n");
                 } catch (SQLException e) {
-                    throw new DbException(e.getMessage());
+                    try {
+                        conn.rollback();
+                        throw new DbException("Falha na atualização do nome causado por: " +  e.getMessage());
+                    } catch (SQLException ex) {
+                        throw new DbException("Falha ao tentar voltar a atualização do nome causado por: " +  ex.getMessage());
+                    }
                 } catch (SameNamesExceptions e) {
                     System.out.println("\nEdição invalida, por favor insira um nome diferente do nome já cadastrada.\n");
                 } finally {
@@ -662,6 +670,7 @@ public class SystemManager {
                     }
 
                     conn = DB.getConnection();
+                    conn.setAutoCommit(false);
                     st = conn.prepareStatement("SELECT COUNT(*) FROM users WHERE Email = ?");
                     st.setString(1, newEmail);
 
@@ -680,11 +689,18 @@ public class SystemManager {
                     st.setInt(2, id);
                     st.executeUpdate();
 
+                    conn.commit();
+
                     System.out.println("\nEmail do usuário editado.\n");
                 } catch (InvalidEmailFormatException e) {
                     System.out.println("\nFormato de email invalido, seu email deve ser informado no seguinte formato: \"usuario@gmail.com\".\n");
                 } catch (SQLException e) {
-                    throw new DbException(e.getMessage());
+                    try {
+                        conn.rollback();
+                        throw new DbException("Falha na atualização do email causado por: " +  e.getMessage());
+                    } catch (SQLException ex) {
+                        throw new DbException("Falha ao tentar voltar a atualização do email causado por: " +  ex.getMessage());
+                    }
                 } catch (EmailAlreadyRegisteredException e) {
                     System.out.println("\nNão é possível cadastrar dois ou mais usuários com um mesmo email, por favor informe um email que ainda não foi cadastrado.\n");
                 } finally {
@@ -704,16 +720,23 @@ public class SystemManager {
                     }
 
                     conn = DB.getConnection();
+                    conn.setAutoCommit(false);
                     st = conn.prepareStatement("UPDATE users SET Age = ? WHERE Id = ?");
                     st.setInt(1, newAge);
                     st.setInt(2, id);
                     st.executeUpdate();
 
+                    conn.commit();
                     System.out.println("\nIdade do usuário editada.\n");
                 } catch (SameAgesExceptions e) {
                     System.out.println("\nEdição invalida, por favor insira uma idade diferente da idade já cadastrada.\n");
                 } catch (SQLException e) {
-                    throw new DbException(e.getMessage());
+                    try {
+                        conn.rollback();
+                        throw new DbException("Falha na atualização da idade causado por: " +  e.getMessage());
+                    } catch (SQLException ex) {
+                        throw new DbException("Falha ao tentar voltar a atualização da idade causado por: " +  ex.getMessage());
+                    }
                 } finally {
                     DB.closeStatement(st);
                 }
@@ -735,16 +758,23 @@ public class SystemManager {
                     }
 
                     conn = DB.getConnection();
+                    conn .setAutoCommit(false);
                     st = conn.prepareStatement("UPDATE users SET Height = ? WHERE Id = ?");
                     st.setDouble(1, newHeight);
                     st.setInt(2, id);
                     st.executeUpdate();
 
+                    conn.commit();
                     System.out.println("\nAltura do usuário editada.\n");
                 } catch (InvalidHeightFormatException e) {
                     System.out.println("\nFormato de altura invalido, sua altura deve ser informada no seguinte formato: \"1,70\".\n");
                 } catch (SQLException e) {
-                    throw new DbException(e.getMessage());
+                    try {
+                        conn.rollback();
+                        throw new DbException("Falha na atualização da altura causado por: " +  e.getMessage());
+                    } catch (SQLException ex) {
+                        throw new DbException("Falha ao tentar voltar a atualização da altura causado por: " +  ex.getMessage());
+                    }
                 } catch (SameHeightExceptions e) {
                     System.out.println("\nEdição invalida, por favor insira uma altura diferente da altura já cadastrada.\n");
                 } finally {
